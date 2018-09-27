@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:08:47 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/09/23 20:31:54 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/09/26 22:59:29 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,12 @@
 # define GET_DISPL_GRP(v) (BITSET(v, 7))
 # define GET_NO_RECURSE(v) (BITSET(v, 8))
 # define GET_COLOR_OUT(v) (BITSET(v, 9))
+
+typedef struct	s_lsopt
+{
+	char		*name;
+	int			position;
+}				t_lsopt;
 
 typedef struct	s_ls
 {
