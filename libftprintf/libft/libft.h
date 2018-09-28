@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/16 12:34:43 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/09/27 21:51:15 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/09/28 15:35:32 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -293,7 +293,7 @@ void					*ft_lstfoldl(void *(*f)(void *final
 												, size_t i
 												, int *stop)
 									, t_list *list);
-void					ft_lstmergesort(int (*f)(void *first, void *second),
+t_list					*ft_lstmergesort(int (*f)(void *first, void *second),
 									t_list *list, int reverse, size_t size);
 t_list					*ft_lstsplit(t_list *list, int index);
 

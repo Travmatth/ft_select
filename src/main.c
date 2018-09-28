@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:06:46 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/09/27 20:36:39 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/09/28 16:39:06 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,6 +102,7 @@ int		main(int argc, char **argv)
 {
 	t_ls	ctx;
 
+	test_arrmerge();
 	if (!(ctx.stack = ft_bufnew(ft_memalloc(sizeof(t_dir)), 0, sizeof(t_dir))))
 		return (1);
 	if (argc == 1)

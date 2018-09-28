@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/11 13:09:32 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/09/27 21:50:35 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/09/28 14:15:47 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ t_list	*ft_lstsplit(t_list *list, int index)
 	t_list	*tail;
 
 	i = 0;
-	while (list && i++ < index)
+	while (list && i++ < index - 1)
 		list = list->next;
 	if (!list || !list->next)
 		return (NULL);
