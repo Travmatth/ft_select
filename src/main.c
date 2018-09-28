@@ -6,17 +6,17 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:06:46 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/09/26 23:17:26 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/09/27 20:36:39 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ft_ls.h"
 
-/* 
+/*
 ** -l; List in long format.  If the output is to a terminal, a total sum for
 ** all the file sizes is output on a line before the long listing.
 ** -R: Recursively list subdirectories encountered.
-** -a: Include directory entries whose names begin with a dot (.). 
+** -a: Include directory entries whose names begin with a dot (.).
 ** -r: Reverse the order of the sort
 ** -t: Sort by time modified
 ** -u: Sort by time of last access
@@ -25,7 +25,7 @@
 ** (the owner name is suppressed)
 ** -d: Directories are listed as plain files
 ** -G: Enable colorized output
-*/ 
+*/
 
 t_lsopt	g_lsopts[] =
 {
@@ -41,28 +41,59 @@ t_lsopt	g_lsopts[] =
 	{"-G", 9}
 };
 
+void	crawl_files(t_ls *ctx)
+{
+	(void)ctx;
+}
+
+void	ft_ls_usage(void)
+{
+}
+
+int		locate_file(t_ls *ctx, char *dirname, int *i)
+{
+	DIR		*dir;
+	t_dir	d;
+
+	(void)ctx;
+	(void)dirname;
+	*i += 1;
+	if ((dir = opendir(dirname)))
+	{
+		lstat(dirname, &d.d);
+		SET_DIR(ctx->flags);
+		closedir(dir);
+		ft_bufappend(ctx->stack, &d, sizeof(t_dir));
+		return (1);
+	}
+	return (0);
+}
+
 int		parse_opts(t_ls *ctx, int argc, char **argv)
 {
-	size_t	i;
+	int		i;
+	int		n;
 
-	while (argc)
+	n = 1;
+	while (n < argc)
 	{
 		i = 0;
 		while (i < 10)
 		{
-			if (ft_strequ(argv[i], g_lsopts[i].name))
+			if (ft_strequ(argv[n], g_lsopts[i].name))
 			{
 				BITSET(ctx->flags, g_lsopts[i].position);
-				if (g_lsopts[i].name[1] == 'f')
+				if (g_lsopts[i++].name[1] == 'f')
 					BITSET(ctx->flags, 2);
+				break ;
 			}
-			else if (locate_file(ctx, argv[i]))
+			else if (i == 9 && locate_file(ctx, argv[n], &i))
 				continue ;
-			else if (i == 10)
+			else if (i == 9)
 				return (0);
 			i += 1;
 		}
-		argc -= 1;
+		n += 1;
 	}
 	return (1);
 }
@@ -71,11 +102,13 @@ int		main(int argc, char **argv)
 {
 	t_ls	ctx;
 
+	if (!(ctx.stack = ft_bufnew(ft_memalloc(sizeof(t_dir)), 0, sizeof(t_dir))))
+		return (1);
 	if (argc == 1)
-		ft_ls_usage(NULL);
+		ft_ls_usage();
 	else if (parse_opts(&ctx, argc, argv))
 		crawl_files(&ctx);
 	else
-		ft_ls_usage(argv);
+		ft_ls_usage();
 	return (0);
 }

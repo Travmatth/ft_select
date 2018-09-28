@@ -6,7 +6,7 @@
 #    By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/04/19 20:05:48 by tmatthew          #+#    #+#              #
-#    Updated: 2018/09/03 09:51:21 by tmatthew         ###   ########.fr        #
+#    Updated: 2018/09/27 21:50:53 by tmatthew         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,7 +27,7 @@ FT_LST	:= ft_lstadd ft_lstat ft_lstcndforeach ft_lstcndremove \
 		ft_lstlast ft_lstmap ft_lstmerge ft_lstnew ft_lstpeekhead \
 		ft_lstpeektail ft_lstpushback ft_lstpushfront \
 		ft_lstpushparams ft_lstreverse ft_lstsize ft_lststart \
-		ft_lsttail ft_nodedel ft_lstfoldl
+		ft_lsttail ft_nodedel ft_lstfoldl ft_lstsplit ft_lstmergesort
 
 FT_MEM	:= ft_bzero ft_fast_memcmp ft_fast_memcpy ft_memalloc \
 		ft_memccpy ft_memchr ft_memcmp ft_memcpy ft_memdel \
