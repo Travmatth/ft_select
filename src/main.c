@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:06:46 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/09/28 16:39:06 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/09/29 12:01:41 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,9 +41,85 @@ t_lsopt	g_lsopts[] =
 	{"-G", 9}
 };
 
+int		sort_access(void *first, void *second)
+{
+	(void)first;
+	(void)second;
+	return (1);
+}
+
+int		sort_time(void *first, void *second)
+{
+	(void)first;
+	(void)second;
+	return (1);
+}
+
+int		sort_null(void *first, void *second)
+{
+	(void)first;
+	(void)second;
+	return (1);
+}
+
+/*
+**	files add to file list
+**	dirs
+**		push reverse sorted dir onto stack
+**		also add to parents file stack
+*/
+
+void	harvest_dir(t_dir *dir)
+{
+}
+
+/*
+**	print dir contents
+*/
+
+void	print_dir(t_dir *dir)
+{
+}
+
+/*
+**	free dir
+*/
+
+void	free_dir(t_list *dir)
+{
+}
+
+/*
+** reverse sort dirs
+** while stack remains
+**	pop dir
+**	harvest dir
+**		files add to file list
+**		dirs
+**			push reverse sorted dir onto stack
+**			also add to parents file stack
+**	print dir contents
+**	free dir
+*/
+
 void	crawl_files(t_ls *ctx)
 {
-	(void)ctx;
+	int		rev;
+	t_list	*dirs;
+	t_list	*d;
+	int		(*f)(void *first, void *second);
+
+	rev = !GET_REVERSE(ctx->flags);
+	f = GET_SORT_ACCESS(ctx->flags) ? sort_access : sort_null;
+	f = GET_SORT_TIME(ctx->flags) ? sort_time : f;
+	dirs = ft_lstmergesort(f, ctx->stack, rev, ft_lstsize(ctx->stack));
+	while (dirs)
+	{
+		d = ft_lsthead(&dirs);
+		harvest_dir((t_dir*)d->content);
+		print_dir((t_dir*)d->content);
+		free_dir(d);
+	}
 }
 
 void	ft_ls_usage(void)
@@ -55,15 +131,14 @@ int		locate_file(t_ls *ctx, char *dirname, int *i)
 	DIR		*dir;
 	t_dir	d;
 
-	(void)ctx;
-	(void)dirname;
 	*i += 1;
 	if ((dir = opendir(dirname)))
 	{
 		lstat(dirname, &d.d);
-		SET_DIR(ctx->flags);
+		d.dir = 1;
+		d.name = dirname;
 		closedir(dir);
-		ft_bufappend(ctx->stack, &d, sizeof(t_dir));
+		ft_lstpushback(&ctx->stack, ft_lstnew(&d, sizeof(t_dir)));
 		return (1);
 	}
 	return (0);
@@ -87,6 +162,8 @@ int		parse_opts(t_ls *ctx, int argc, char **argv)
 					BITSET(ctx->flags, 2);
 				break ;
 			}
+			else if (i == 9 && SET_NO_SORT(ctx->flags))
+				SET_ALL(ctx->flags);
 			else if (i == 9 && locate_file(ctx, argv[n], &i))
 				continue ;
 			else if (i == 9)
@@ -102,9 +179,6 @@ int		main(int argc, char **argv)
 {
 	t_ls	ctx;
 
-	test_arrmerge();
-	if (!(ctx.stack = ft_bufnew(ft_memalloc(sizeof(t_dir)), 0, sizeof(t_dir))))
-		return (1);
 	if (argc == 1)
 		ft_ls_usage();
 	else if (parse_opts(&ctx, argc, argv))
