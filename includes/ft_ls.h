@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:08:47 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/09/28 19:53:52 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/09/29 22:32:39 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ typedef struct	s_lsopt
 typedef struct	s_dir
 {
 	char		*name;
-	struct stat	d;
+	struct stat	attribs;
 	t_list		*files;
 	char		dir;
 }				t_dir;
@@ -60,6 +60,7 @@ typedef struct	s_ls
 {
 	char		flags[BITNSLOTS(11)];
 	t_list		*stack;
+	int			(*compare)(void *first, void *second);
 }				t_ls;
 
 #endif

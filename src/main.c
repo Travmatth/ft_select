@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:06:46 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/09/29 12:01:41 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/09/29 23:15:50 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,18 +41,36 @@ t_lsopt	g_lsopts[] =
 	{"-G", 9}
 };
 
+/*
+** stat.ST_ATIME | Time of last access.
+*/
+
 int		sort_access(void *first, void *second)
 {
-	(void)first;
-	(void)second;
-	return (1);
+	t_dir *f;
+	t_dir *s;
+
+	f = (t_dir*)first;
+	s = (t_dir*)second;
+	return (f->attribs.st_atime - s->attribs.st_atime);
 }
+
+/*
+** stat.ST_MTIME | Time of last modification.
+*/
+
+/*
+** stat.ST_CTIME | On Unix systems is the time of the last metadata change
+*/
 
 int		sort_time(void *first, void *second)
 {
-	(void)first;
-	(void)second;
-	return (1);
+	t_dir *f;
+	t_dir *s;
+
+	f = (t_dir*)first;
+	s = (t_dir*)second;
+	return (f->attribs.st_mtime - s->attribs.st_mtime);
 }
 
 int		sort_null(void *first, void *second)
@@ -67,10 +85,64 @@ int		sort_null(void *first, void *second)
 **	dirs
 **		push reverse sorted dir onto stack
 **		also add to parents file stack
+    struct dirent *de;  // Pointer for directory entry 
+  
+    // opendir() returns a pointer of DIR type.  
+    DIR *dr = opendir("."); 
+  
+    if (dr == NULL)  // opendir returns NULL if couldn't open directory 
+    { 
+        printf("Could not open current directory" ); 
+        return 0; 
+    } 
+  
+    // Refer http://pubs.opengroup.org/onlinepubs/7990989775/xsh/readdir.html 
+    // for readdir() 
+    while ((de = readdir(dr)) != NULL) 
+            printf("%s\n", de->d_name); 
+  
+    closedir(dr);   
 */
 
-void	harvest_dir(t_dir *dir)
+void	harvest_dir(t_ls *ctx, t_dir *dir)
 {
+	(void)ctx;
+	// hold discovered directories
+	// t_list	*dirs;
+	struct dirent	*d;
+	DIR		*dr;
+	// struct stat	attribs;
+
+	if ((dr = opendir(dir->name)))
+	{
+		while ((d = readdir(dr)))
+		{
+			continue ;
+		}
+		closedir(dr);
+	}
+	//
+	// dirs = ft_lstmergesort(f, ctx->stack, rev, ft_lstsize(ctx->stack));
+	// while (dirs)
+	// {
+	// 	d = ft_lsttail(&dirs);
+	// 	harvest_dir((t_dir*)d->content);
+	// 	print_dir((t_dir*)d->content);
+	// 	free_dir(d);
+	// }
+	// DIR		*dir;
+	// t_dir	d;
+
+	// if ((dir = opendir(dirname)))
+	// {
+	// 	lstat(dirname, &d.attribs);
+	// 	d.dir = 1;
+	// 	d.name = dirname;
+	// 	closedir(dir);
+	// 	ft_lstpushback(&ctx->stack, ft_lstnew(&d, sizeof(t_dir)));
+	// 	return (1);
+	// }
+	// return (0);
 }
 
 /*
@@ -79,6 +151,7 @@ void	harvest_dir(t_dir *dir)
 
 void	print_dir(t_dir *dir)
 {
+	(void)dir;
 }
 
 /*
@@ -87,6 +160,7 @@ void	print_dir(t_dir *dir)
 
 void	free_dir(t_list *dir)
 {
+	(void)dir;
 }
 
 /*
@@ -107,16 +181,16 @@ void	crawl_files(t_ls *ctx)
 	int		rev;
 	t_list	*dirs;
 	t_list	*d;
-	int		(*f)(void *first, void *second);
 
 	rev = !GET_REVERSE(ctx->flags);
-	f = GET_SORT_ACCESS(ctx->flags) ? sort_access : sort_null;
-	f = GET_SORT_TIME(ctx->flags) ? sort_time : f;
-	dirs = ft_lstmergesort(f, ctx->stack, rev, ft_lstsize(ctx->stack));
+	ctx->compare = sort_null;
+	GET_SORT_ACCESS(ctx->flags) ? (ctx->compare = sort_access) : NULL;
+	GET_SORT_TIME(ctx->flags) ? (ctx->compare = sort_time) : NULL;
+	dirs = ft_lstmergesort(ctx->compare, ctx->stack, rev, ft_lstsize(ctx->stack));
 	while (dirs)
 	{
-		d = ft_lsthead(&dirs);
-		harvest_dir((t_dir*)d->content);
+		d = ft_lsttail(&dirs);
+		harvest_dir(ctx, (t_dir*)d->content);
 		print_dir((t_dir*)d->content);
 		free_dir(d);
 	}
@@ -126,15 +200,14 @@ void	ft_ls_usage(void)
 {
 }
 
-int		locate_file(t_ls *ctx, char *dirname, int *i)
+int		locate_file(t_ls *ctx, char *dirname)
 {
 	DIR		*dir;
 	t_dir	d;
 
-	*i += 1;
 	if ((dir = opendir(dirname)))
 	{
-		lstat(dirname, &d.d);
+		lstat(dirname, &d.attribs);
 		d.dir = 1;
 		d.name = dirname;
 		closedir(dir);
@@ -162,11 +235,9 @@ int		parse_opts(t_ls *ctx, int argc, char **argv)
 					BITSET(ctx->flags, 2);
 				break ;
 			}
-			else if (i == 9 && SET_NO_SORT(ctx->flags))
+			if (i == 9 && SET_NO_SORT(ctx->flags))
 				SET_ALL(ctx->flags);
-			else if (i == 9 && locate_file(ctx, argv[n], &i))
-				continue ;
-			else if (i == 9)
+			if (i == 9 && !locate_file(ctx, argv[n]))
 				return (0);
 			i += 1;
 		}
