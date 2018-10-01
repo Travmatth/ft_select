@@ -12,7 +12,7 @@ NAME = ft_ls
 LIBFT = libftprintf/libftprintf.a
 CFLAGS += -Wall -Wextra -Werror -Wpedantic
 LDFLAGS := -Llibftprintf -lftprintf -I./includes
-CORE := main
+CORE := main crawl print sort
 FILES := $(addprefix src/, $(CORE))
 SRC := $(addsuffix .c, $(FILES))
 OBJ := $(SRC:.c=.o)

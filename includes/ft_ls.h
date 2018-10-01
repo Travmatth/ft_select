@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:08:47 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/09/29 22:32:39 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/09/30 18:58:48 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,4 +63,9 @@ typedef struct	s_ls
 	int			(*compare)(void *first, void *second);
 }				t_ls;
 
+void			crawl_files(t_ls *ctx);
+void			print_dir(t_ls *ctx, t_dir *dir);
+int				sort_access(void *first, void *second);
+int				sort_time(void *first, void *second);
+int				sort_null(void *first, void *second);
 #endif
