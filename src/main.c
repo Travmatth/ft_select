@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:06:46 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/09/30 19:49:10 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/02 20:18:47 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,14 +47,15 @@ void	ft_ls_usage(void)
 
 int		locate_file(t_ls *ctx, char *dirname)
 {
-	DIR		*dir;
-	t_dir	d;
+	DIR			*dir;
+	t_dir		d;
+	struct stat	attribs;
 
 	if ((dir = opendir(dirname)))
 	{
-		lstat(dirname, &d.attribs);
-		d.dir = 1;
+		lstat(dirname, &attribs);
 		d.name = dirname;
+		harvest_node(NULL, &d, &attribs, 0);
 		closedir(dir);
 		ft_lstpushback(&ctx->stack, ft_lstnew(&d, sizeof(t_dir)));
 		return (1);
@@ -98,7 +99,10 @@ int		main(int argc, char **argv)
 	if (argc == 1)
 		ft_ls_usage();
 	else if (parse_opts(&ctx, argc, argv))
+	{
 		crawl_files(&ctx);
+		print_files(&ctx);
+	}
 	else
 		ft_ls_usage();
 	return (0);

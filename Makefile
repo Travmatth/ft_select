@@ -32,19 +32,19 @@ $(OBJ): %.o: %.c
 	@$(CC) -c $(DEBUG) -I. $(CFLAGS) $< -o $@
 
 $(NAME): $(LIBFT) $(OBJ)
-	@echo -n 'Compiling ft_ssl... '
+	@echo -n 'Compiling ft_ls... '
 	@$(CC) $(DEBUG) $(CFLAGS) $(LDFLAGS) $(OBJ) -o $@
 	@echo "\033[32mdone\033[0m"
 
 clean:
 	@$(MAKE) clean -C libftprintf
-	@echo -n 'Cleaning ft_ssl object files... '
+	@echo -n 'Cleaning ft_ls object files... '
 	@rm -f $(OBJ) *.dSYM *.DS_Store
 	@echo "\033[32mdone\033[0m"
 
 fclean: clean
 	@$(MAKE) fclean -C libftprintf
-	@echo -n 'Cleaning ft_ssl executable... '
+	@echo -n 'Cleaning ft_ls executable... '
 	@rm -f $(NAME)
 	@echo "\033[32mdone\033[0m"
 

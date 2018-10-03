@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:08:47 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/09/30 18:58:48 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/02 20:36:23 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,9 @@
 # define FT_LS_H
 
 # include <fcntl.h>
+# include <pwd.h>
+# include <grp.h>
+# include <time.h>
 # include "../libftprintf/srcs/includes/ft_printf.h"
 # include <dirent.h>
 # include <sys/stat.h>
@@ -48,12 +51,30 @@ typedef struct	s_lsopt
 	int			position;
 }				t_lsopt;
 
+typedef struct	s_width
+{
+	size_t		link;
+	size_t		size;
+	size_t		owner_name;
+	size_t		owner_group;
+	size_t		file_size;
+	size_t		day;
+}				t_width;
+
 typedef struct	s_dir
 {
 	char		*name;
-	struct stat	attribs;
+	char		*links;
+	char		*owner_name;
+	char		*owner_group;
+	char		*size;
+	char		*date;
+	t_width		width;
 	t_list		*files;
-	char		dir;
+	long		atime;
+	long		mtime;
+	int			dir;
+	mode_t		mode;
 }				t_dir;
 
 typedef struct	s_ls
@@ -64,7 +85,11 @@ typedef struct	s_ls
 }				t_ls;
 
 void			crawl_files(t_ls *ctx);
-void			print_dir(t_ls *ctx, t_dir *dir);
+void			print_files(t_ls *ctx);
+void			harvest_node(t_dir *dir
+							, t_dir *node
+							, struct stat *attribs
+							, int lens);
 int				sort_access(void *first, void *second);
 int				sort_time(void *first, void *second);
 int				sort_null(void *first, void *second);

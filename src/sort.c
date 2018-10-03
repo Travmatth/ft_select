@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/30 18:55:12 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/09/30 18:55:25 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/02 20:24:57 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ int		sort_access(void *first, void *second)
 
 	f = (t_dir*)first;
 	s = (t_dir*)second;
-	return (f->attribs.st_atime - s->attribs.st_atime);
+	return (f->atime - s->atime);
 }
 
 /*
@@ -41,7 +41,7 @@ int		sort_time(void *first, void *second)
 
 	f = (t_dir*)first;
 	s = (t_dir*)second;
-	return (f->attribs.st_mtime - s->attribs.st_mtime);
+	return (f->mtime - s->mtime);
 }
 
 int		sort_null(void *first, void *second)
