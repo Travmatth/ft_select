@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:06:46 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/02 20:18:47 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/05 21:22:40 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,13 +49,16 @@ int		locate_file(t_ls *ctx, char *dirname)
 {
 	DIR			*dir;
 	t_dir		d;
-	struct stat	attribs;
+	// struct stat	attribs;
 
 	if ((dir = opendir(dirname)))
 	{
-		lstat(dirname, &attribs);
+		// lstat(dirname, &attribs);
+		ft_bzero((void*)&d, sizeof(t_dir));
 		d.name = dirname;
-		harvest_node(NULL, &d, &attribs, 0);
+		d.parent = dirname;
+		d.root = 1;
+		// harvest_node(ctx, NULL, &d, &attribs);
 		closedir(dir);
 		ft_lstpushback(&ctx->stack, ft_lstnew(&d, sizeof(t_dir)));
 		return (1);
@@ -81,7 +84,7 @@ int		parse_opts(t_ls *ctx, int argc, char **argv)
 					BITSET(ctx->flags, 2);
 				break ;
 			}
-			if (i == 9 && SET_NO_SORT(ctx->flags))
+			if (i == 9 && GET_NO_SORT(ctx->flags))
 				SET_ALL(ctx->flags);
 			if (i == 9 && !locate_file(ctx, argv[n]))
 				return (0);
@@ -96,13 +99,11 @@ int		main(int argc, char **argv)
 {
 	t_ls	ctx;
 
+	ft_bzero(&ctx, sizeof(t_ls));
 	if (argc == 1)
 		ft_ls_usage();
 	else if (parse_opts(&ctx, argc, argv))
-	{
 		crawl_files(&ctx);
-		print_files(&ctx);
-	}
 	else
 		ft_ls_usage();
 	return (0);
