@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/30 18:54:23 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/06 14:28:10 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/06 15:43:56 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@ void	print_dir(t_ls *ctx, t_dir *dir)
 	if (!dir->root || (dir->root && ctx->top_lvl_dirs > 1))
 	{
 		write(STDOUT, dir->full, LEN(dir->full, 0));
-		write(STDOUT, "\n", 1);
+		write(STDOUT, ":\n", 1);
 	}
 	while (node)
 	{
@@ -90,7 +90,6 @@ void	print_dir(t_ls *ctx, t_dir *dir)
 			ft_printf(COLOR(n), (int)dir->width.name, n->name);
 			node = ft_lsttail(&dir->files);
 		}
-		write(STDOUT, "\n", 1);
-		write(STDOUT, "\n", 1);
+		write(STDOUT, "\n\n", 2);
 	}
 }

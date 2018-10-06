@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:06:46 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/06 14:58:14 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/06 15:42:27 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,23 +29,23 @@
 
 t_lsopt	g_lsopts[] =
 {
-	{"-l", 0},
-	{"-R", 1},
-	{"-a", 2},
-	{"-r", 3},
-	{"-t", 4},
-	{"-u", 5},
-	{"-f", 6},
-	{"-g", 7},
-	{"-d", 8},
-	{"-G", 9}
+	{'l', 0},
+	{'R', 1},
+	{'a', 2},
+	{'r', 3},
+	{'t', 4},
+	{'u', 5},
+	{'f', 6},
+	{'g', 7},
+	{'d', 8},
+	{'G', 9}
 };
 
 void	ft_ls_usage(void)
 {
 }
 
-int		locate_file(t_ls *ctx, char *dirname)
+void	locate_file(t_ls *ctx, char *dirname)
 {
 	DIR			*dir;
 	t_dir		d;
@@ -59,40 +59,55 @@ int		locate_file(t_ls *ctx, char *dirname)
 		ctx->top_lvl_dirs += 1;
 		closedir(dir);
 		ft_lstpushback(&ctx->stack, ft_lstnew(&d, sizeof(t_dir)));
-		return (1);
 	}
-	eturn (0);
+	else
+		ft_printf("ls: %s: No such file or directory\n", dirname);
 }
 
-// Need to handle multiple opts in same flag: -laR
-// Need to handle 
+void	parse_opt(t_ls *ctx, char opt)
+{
+	int		i;
+	int		found;
+
+	found = 0;
+	i = 0;
+	while (i < 10)
+	{
+		if (opt == g_lsopts[i].name)
+		{
+			BITSET(ctx->flags, g_lsopts[i].position);
+			if (g_lsopts[i++].name == 'f')
+				BITSET(ctx->flags, 2);
+			found = 1;
+			break ;
+		}
+		i += 1;
+	}
+	if (!found)
+		ft_ls_usage();
+}
 
 int		parse_opts(t_ls *ctx, int argc, char **argv)
 {
-	int		i;
 	int		n;
+	size_t	i;
+	size_t	len;
 
 	n = 1;
 	while (n < argc)
 	{
-		i = 0;
-		while (i < 10)
-		{
-			if (ft_strequ(argv[n], g_lsopts[i].name))
-			{
-				BITSET(ctx->flags, g_lsopts[i].position);
-				if (g_lsopts[i++].name[1] == 'f')
-					BITSET(ctx->flags, 2);
-				break ;
-			}
-			if (i == 9 && GET_NO_SORT(ctx->flags))
-				SET_ALL(ctx->flags);
-			if (i == 9 && !locate_file(ctx, argv[n]))
-				return (0);
-			i += 1;
-		}
+		i = 1;
+		len = LEN(argv[n], 0);
+		if (argv[n][0] != '-')
+			break ;
+		if (!len || len < 2)
+			ft_ls_usage();
+		while (i < len)
+			parse_opt(ctx, argv[n][i++]);
 		n += 1;
 	}
+	while (n < argc)
+		locate_file(ctx, argv[n++]);
 	return (1);
 }
 
@@ -102,10 +117,9 @@ int		main(int argc, char **argv)
 
 	ft_bzero(&ctx, sizeof(t_ls));
 	if (argc == 1)
-		ft_ls_usage();
-	else if (parse_opts(&ctx, argc, argv))
-		crawl_files(&ctx);
+		locate_file(&ctx, ".");
 	else
-		ft_ls_usage();
+		parse_opts(&ctx, argc, argv);
+	crawl_files(&ctx);
 	return (0);
 }

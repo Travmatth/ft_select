@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:08:47 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/06 14:26:59 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/06 15:37:09 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@
 
 typedef struct	s_lsopt
 {
-	char		*name;
+	char		name;
 	int			position;
 }				t_lsopt;
 
@@ -91,6 +91,7 @@ typedef struct	s_ls
 	int			top_lvl_dirs;
 }				t_ls;
 
+void			ft_ls_usage(void);
 void			crawl_files(t_ls *ctx);
 void			print_dir(t_ls *ctx, t_dir *dir);
 void			harvest_node(t_ls *ctx
