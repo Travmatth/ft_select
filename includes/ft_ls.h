@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:08:47 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/05 21:22:52 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/06 14:26:59 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,6 +88,7 @@ typedef struct	s_ls
 	char		flags[BITNSLOTS(11)];
 	t_list		*stack;
 	int			(*compare)(void *first, void *second);
+	int			top_lvl_dirs;
 }				t_ls;
 
 void			crawl_files(t_ls *ctx);
@@ -98,5 +99,5 @@ void			harvest_node(t_ls *ctx
 							, struct stat *attribs);
 int				sort_access(void *first, void *second);
 int				sort_time(void *first, void *second);
-int				sort_null(void *first, void *second);
+int				sort_alpha(void *first, void *second);
 #endif

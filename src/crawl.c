@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/30 18:56:11 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/05 21:41:17 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/06 13:42:33 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,8 @@ char	*form_dir(t_dir *dir, char *name)
 
 	if (dir->root)
 		return (ft_strdup(dir->name));
+	if (dir->full)
+		return (dir->full);
 	len = LEN(dir->parent, 0) + LEN(name, 0) + 1;
 	str = ft_strnew(len);
 	ft_memcpy((void*)str, dir->parent, LEN(dir->parent, 0));
@@ -82,9 +84,9 @@ char	*form_path(t_dir *dir, char *name)
 	size_t	len;
 	char	*str;
 
-	len = LEN(dir->parent, 0) + LEN(name, 0) + 1;
+	len = LEN(dir->full, 0) + LEN(name, 0) + 1;
 	str = ft_strnew(len);
-	ft_memcpy((void*)str, dir->parent, LEN(dir->parent, 0));
+	ft_memcpy((void*)str, dir->full, LEN(dir->full, 0));
 	ft_strcat(str, "/");
 	ft_strcat(str, name);
 	return (str);
@@ -130,7 +132,7 @@ void	crawl_files(t_ls *ctx)
 	t_list	*d;
 
 	rev = !GET_REVERSE(ctx->flags);
-	ctx->compare = sort_null;
+	ctx->compare = sort_alpha;
 	GET_SORT_ACCESS(ctx->flags) ? (ctx->compare = sort_access) : NULL;
 	GET_SORT_TIME(ctx->flags) ? (ctx->compare = sort_time) : NULL;
 	ctx->stack = ft_lstmergesort(ctx->compare, ctx->stack, rev, ft_lstsize(ctx->stack));

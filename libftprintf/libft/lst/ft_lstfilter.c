@@ -14,60 +14,36 @@
 
 /*
 ** ft_lstfilter
-** Description Iterates the list lst and applies the function f to each link.
+** Description Iterates the list lst and applies the function *f to each link.
+** Removes nodes that return true from the list, deletes node by passing to *d
 ** Param. #1 A pointer to the first link of a list.
-** Param. #2 The address of a function to apply to each link of a list.
-** Return value None.
+** Param. #2 The address of filter function to apply to each link of a list.
+** Param. #3 The address of delete function to apply to removed links.
+** Return value the given list, with specified nodes removed and deleted.
 ** Libc functions None.
 */
 
-t_list	*take_top(t_list *lst
-	, int (*f)(t_list *elem)
-	, void (*d)(t_list *elem))
+t_list	*ft_lstfilter(t_list *list, int (*f)(t_list *elem),
+		void (*del)(t_list *elem))
 {
-	if (f(lst))
-	{
-		d(lst);
-		free(lst->content);
-		free(lst);
-		return (NULL);
-	}
-	else
-		return (lst);
-}
+	t_list	*result;
+	t_list	*next;
 
-t_list	*filter_lists(t_list *lst
-	, int (*f)(t_list *elem)
-	, void (*d)(t_list *elem))
-{
-	t_list	*parent;
-	t_list	*tmp;
-
-	tmp = lst;
-	parent = tmp;
-	while (tmp)
+	result = NULL;
+	while (list)
 	{
-		if (f(tmp))
+		next = list->next;
+		if (!f(list))
 		{
-			parent->next = tmp->next;
-			d(tmp);
-			free(tmp->content);
-			free(tmp);
-			tmp = parent;
+			list->next = NULL;
+			ft_lstpushback(&result, list);
 		}
-		parent = tmp;
-		tmp = tmp->next;
+		else
+		{
+			del(list);
+			free(list);
+		}
+		list = next;
 	}
-	return (lst);
-}
-
-t_list	*ft_lstfilter(t_list *lst
-	, int (*f)(t_list *elem)
-	, void (*d)(t_list *elem))
-{
-	if (!lst)
-		return (NULL);
-	if (!lst->next)
-		return (take_top(lst, f, d));
-	return (filter_lists(lst, f, d));
+	return (result);
 }

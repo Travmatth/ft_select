@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/21 18:21:34 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/06/29 20:12:33 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/06 13:21:41 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,8 +54,8 @@ void	add_color_codes(t_fmt *fmt)
 	char	*tmp;
 
 	if ((!fmt->out || fmt->len.out <= 1
-		|| ft_count_char(fmt->out, '{') < 2
-		|| ft_count_char(fmt->out, '}') < 2))
+		|| ft_count_char(fmt->out, '{') < 1
+		|| ft_count_char(fmt->out, '}') < 1))
 		return ;
 	i = -1;
 	while (++i < 33)

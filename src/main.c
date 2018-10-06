@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:06:46 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/05 21:22:40 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/06 14:58:14 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,22 +49,23 @@ int		locate_file(t_ls *ctx, char *dirname)
 {
 	DIR			*dir;
 	t_dir		d;
-	// struct stat	attribs;
 
 	if ((dir = opendir(dirname)))
 	{
-		// lstat(dirname, &attribs);
 		ft_bzero((void*)&d, sizeof(t_dir));
 		d.name = dirname;
 		d.parent = dirname;
 		d.root = 1;
-		// harvest_node(ctx, NULL, &d, &attribs);
+		ctx->top_lvl_dirs += 1;
 		closedir(dir);
 		ft_lstpushback(&ctx->stack, ft_lstnew(&d, sizeof(t_dir)));
 		return (1);
 	}
-	return (0);
+	eturn (0);
 }
+
+// Need to handle multiple opts in same flag: -laR
+// Need to handle 
 
 int		parse_opts(t_ls *ctx, int argc, char **argv)
 {

@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/30 18:55:12 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/02 20:24:57 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/06 14:23:30 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,9 +44,16 @@ int		sort_time(void *first, void *second)
 	return (f->mtime - s->mtime);
 }
 
-int		sort_null(void *first, void *second)
+int		sort_alpha(void *first, void *second)
 {
-	(void)first;
-	(void)second;
-	return (1);
+	char 	*f;
+	char 	*s;
+	int		sort;
+
+	f = ((t_dir*)first)->full ? ((t_dir*)first)->full : ((t_dir*)first)->name;
+	s = ((t_dir*)second)->full ? ((t_dir*)second)->full : ((t_dir*)second)->name;
+	sort = ft_strcmp(f, s);
+	if (sort <= 0)
+		return (1);
+	return (0);
 }

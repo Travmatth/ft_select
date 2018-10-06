@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/30 18:54:23 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/05 19:16:40 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/06 14:28:10 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,8 @@ void	remove_hidden(t_list *elem)
 	free_dir((t_dir*)elem->content);
 }
 
+# define COLOR(n) (n->dir ? "{bblue}%-*s{eoc} " : "%-*s ")
+
 void	print_dir(t_ls *ctx, t_dir *dir)
 {
 	t_list			*node;
@@ -68,24 +70,27 @@ void	print_dir(t_ls *ctx, t_dir *dir)
 	if (GET_LONG(ctx->flags))
 		print_long_listing(ctx, dir);
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-	files_per_line = (w.ws_col ? w.ws_col : 80) / dir->width.name;
-	// write(STDOUT, dir->name, LEN(dir->name, 0));
-	// write(STDOUT, "\n", 1);
-	dir->files = GET_ALL(ctx->flags) 
-		? dir->files
-		: ft_lstfilter(dir->files, find_hidden, remove_hidden);
+	files_per_line = (w.ws_col ? w.ws_col : 80)
+		/ (dir->width.name ? dir->width.name : LEN(dir->name, 0));
+	if (!GET_ALL(ctx->flags))
+		dir->files = ft_lstfilter(dir->files, find_hidden, remove_hidden);
 	node = ft_lsttail(&dir->files);
+	if (!dir->root || (dir->root && ctx->top_lvl_dirs > 1))
+	{
+		write(STDOUT, dir->full, LEN(dir->full, 0));
+		write(STDOUT, "\n", 1);
+	}
 	while (node)
 	{
 		i = 0;
+		n = (t_dir*)node->content;
 		while (node && i++ < files_per_line)
 		{
 			n = (t_dir*)node->content;
-			ft_printf("%-*s ", (int)dir->width.name, n->name);
+			ft_printf(COLOR(n), (int)dir->width.name, n->name);
 			node = ft_lsttail(&dir->files);
 		}
 		write(STDOUT, "\n", 1);
+		write(STDOUT, "\n", 1);
 	}
-	// need to owner and group names, time last modified
-	// ft_dprintf(STDOUT, "%s %d %s %s %d %s %s", permissions, file->attribs.st_nlink, )
 }
