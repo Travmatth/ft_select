@@ -6,16 +6,15 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/30 18:56:11 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/06 13:42:33 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/06 18:54:34 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 #include "../includes/ft_ls.h"
 
-void	harvest_node(t_ls *ctx, t_dir *dir, t_dir *node, struct stat *attribs)
+void	harvest_node(t_ls *ctx, t_dir *node, struct stat *attribs)
 {
-	size_t			len;
 	struct passwd	*pw;
 	struct group	*gr;
 
@@ -27,19 +26,11 @@ void	harvest_node(t_ls *ctx, t_dir *dir, t_dir *node, struct stat *attribs)
 	node->mtime = attribs->st_mtimespec.tv_nsec;
 	node->atime = attribs->st_atimespec.tv_nsec;
 	node->links = ft_itoa(attribs->st_nlink);
-	if (dir && (len = LEN(node->links, 0)) > dir->width.link)
-		dir->width.link = len;
 	if ((pw = getpwuid(attribs->st_uid)))
 		node->owner_name = pw->pw_name;
-	if (dir && (len = LEN(node->owner_name, 0)) > dir->width.owner_name)
-		dir->width.owner_name = len;
 	if ((gr = getgrgid(attribs->st_gid)))
 		node->owner_group = gr->gr_name;
-	if (dir && (len = LEN(node->owner_group, 0)) > dir->width.owner_group)
-		dir->width.owner_group = len;
 	node->size = ft_itoa(attribs->st_size);
-	if (dir && (len = LEN(node->size, 0)) > dir->width.size)
-		dir->width.size = len;
 }
 
 /*
@@ -52,11 +43,11 @@ int		add_dir_name(t_dir *dir, char *current, t_dir *node)
 	size_t			len;
 
 	node->name = ft_strdup(current);
-	if ((len = LEN(current, 0)) > dir->width.name)
-		dir->width.name = len;
+	if ((len = LEN(current, 0)) > dir->name_width)
+		dir->name_width = len;
 	node->parent = ft_strdup(dir->parent);
-	if ((len = LEN(node->parent, 0)) > dir->width.parent)
-		dir->width.parent = len;
+	if ((len = LEN(node->parent, 0)) > dir->parent_width)
+		dir->parent_width = len;
 	if (node->dir && !ft_strequ(".", current) && !ft_strequ("..", current))
 		return (1);
 	return (0);
@@ -108,7 +99,7 @@ void	harvest_dir(t_ls *ctx, t_dir *dir)
 			ft_bzero(&node, sizeof(t_dir));
 			if (ERR(lstat((node.full = form_path(dir, d->d_name)), &attribs)))
 				continue ;
-			harvest_node(ctx, dir, &node, &attribs);
+			harvest_node(ctx, &node, &attribs);
 			if (add_dir_name(dir, d->d_name, &node) && GET_RECURSE(ctx->flags))
 				ft_lstpushback(&dirs, ft_lstnew((void*)&node, sizeof(t_dir)));
 			ft_lstpushback(&dir->files, ft_lstnew((void*)&node, sizeof(t_dir)));

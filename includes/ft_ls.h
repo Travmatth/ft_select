@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:08:47 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/06 15:37:09 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/06 18:55:53 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,17 +52,19 @@ typedef struct	s_lsopt
 	int			position;
 }				t_lsopt;
 
-typedef struct	s_width
-{
-	size_t		name;
-	size_t		parent;
-	size_t		link;
-	size_t		size;
-	size_t		owner_name;
-	size_t		owner_group;
-	size_t		file_size;
-	size_t		day;
-}				t_width;
+// typedef struct	s_width
+// {
+// 	size_t		name;
+// 	size_t		parent;
+// 	size_t		link;
+// 	size_t		size;
+// 	size_t		owner_name;
+// 	size_t		owner_group;
+// 	size_t		file_size;
+// 	size_t		day;
+// }				t_width;
+
+#include <sys/types.h>
 
 typedef struct	s_dir
 {
@@ -74,13 +76,15 @@ typedef struct	s_dir
 	char		*owner_group;
 	char		*size;
 	char		*date;
-	t_width		width;
+	size_t		name_width;
+	size_t		parent_width;
 	t_list		*files;
 	long		atime;
 	long		mtime;
 	int			dir;
 	int			root;
 	mode_t		mode;
+	char		*total;
 }				t_dir;
 
 typedef struct	s_ls
@@ -91,11 +95,15 @@ typedef struct	s_ls
 	int			top_lvl_dirs;
 }				t_ls;
 
+void			*find_link(void *final, t_list *elem, size_t i, int *stop);
+void			*find_name(void *final, t_list *elem, size_t i, int *stop);
+void			*find_grp(void *final, t_list *elem, size_t i, int *stop);
+void			*find_size(void *final, t_list *elem, size_t i, int *stop);
+int				*find_widths(t_list *lst, int widths[5]);
 void			ft_ls_usage(void);
 void			crawl_files(t_ls *ctx);
 void			print_dir(t_ls *ctx, t_dir *dir);
 void			harvest_node(t_ls *ctx
-							, t_dir *dir
 							, t_dir *node
 							, struct stat *attribs);
 int				sort_access(void *first, void *second);

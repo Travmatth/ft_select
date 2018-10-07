@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:06:46 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/06 15:42:27 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/06 18:56:20 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,16 +49,21 @@ void	locate_file(t_ls *ctx, char *dirname)
 {
 	DIR			*dir;
 	t_dir		d;
+	struct stat		attribs;
 
 	if ((dir = opendir(dirname)))
 	{
 		ft_bzero((void*)&d, sizeof(t_dir));
-		d.name = dirname;
-		d.parent = dirname;
-		d.root = 1;
-		ctx->top_lvl_dirs += 1;
-		closedir(dir);
-		ft_lstpushback(&ctx->stack, ft_lstnew(&d, sizeof(t_dir)));
+		if (!ERR(lstat(dirname, &attribs)))
+		{
+			d.name = dirname;
+			d.parent = dirname;
+			d.root = 1;
+			ctx->top_lvl_dirs += 1;
+			d.total = ft_itoa((int)attribs.st_blocks);
+			closedir(dir);
+			ft_lstpushback(&ctx->stack, ft_lstnew(&d, sizeof(t_dir)));
+		}
 	}
 	else
 		ft_printf("ls: %s: No such file or directory\n", dirname);
