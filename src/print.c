@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/30 18:54:23 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/06 18:58:35 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/09 00:24:37 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,24 +17,6 @@
 */
 
 static	char 	*permissions = "----------";
-
-int		find_hidden(t_list *elem)
-{
-	t_dir	*d;
-
-	d = (t_dir*)elem->content;
-	return (ft_strequ(".", d->name) || ft_strequ("..", d->name));
-}
-
-void	free_dir(t_dir *dir)
-{
-	(void)dir;
-}
-
-void	remove_hidden(t_list *elem)
-{
-	free_dir((t_dir*)elem->content);
-}
 
 char	*format_permissions(t_dir *file)
 {
@@ -69,37 +51,114 @@ char	*format_date(char *date)
 		out[4] = parts[2][0];
 		out[5] = parts[2][1];
 	}
+	else
+	{
+		out[4] = ' ';
+		out[5] = parts[2][0];
+	}
 	out[6] = ' ';
 	ft_memcpy((void*)(out + 7), parts[3], 5);
 	return (out);
 }
 
-void	print_long_listing(t_dir *dir)
+char	*format_name(t_dir *node)
+{
+	char	buf[256];
+	char	*out;
+	ssize_t	bytes;
+	char	*name;
+
+	if (!S_ISLNK(node->mode))
+		return (ft_strdup(node->name));
+	ft_bzero(buf, 256);
+	name = node->full ? node->full : node->name;
+	bytes = readlink(name, buf, 255);
+	ft_asprintf(&out, "%s -> %s", name, buf);
+	return (out);
+}
+
+void	print_long_listings(t_list *lst, char *totals)
 {
 	t_list	*node;
 	t_dir	*n;
 	char	*perms;
 	int		widths[4];
 
-	find_widths(dir->files, widths);
-	node = ft_lsttail(&dir->files);
-	ft_printf("total: %s\n", dir->total);
+	find_widths(lst, widths);
+	node = ft_lsttail(&lst);
+	if (totals)
+		ft_printf("total %s\n", totals);
 	while (node)
 	{
 		n = (t_dir*)node->content;
 		while (node)
 		{
 			n = (t_dir*)node->content;
-			perms = format_permissions(n);
-			ft_printf("%s  %*s %*s  %*s  %*s %s %s", perms, widths[0], n->links
-				, widths[1], n->owner_name
-				, widths[2], n->owner_group
-				, widths[3], n->size
-				, format_date(n->date), n->name);
+			if (n->denied)
+				ft_printf("ls: %s: Permission denied", n->name);
+			else
+			{
+				perms = format_permissions(n);
+				n->date_str = format_date(n->date);
+				n->name_str = format_name(n);
+				ft_printf("%s  %*s %*s  %*s  %*s %s %s", perms, widths[0], n->links
+					, widths[1], n->owner_name
+					, widths[2], n->owner_group
+					, widths[3], n->size
+					, n->date_str, n->name_str);
+			}
 			write(STDOUT, "\n", 1);
-			node = ft_lsttail(&dir->files);
+			node = ft_lsttail(&lst);
 		}
-		write(STDOUT, "\n", 1);
+		if (node)
+			write(STDOUT, "\n", 1);
+	}
+}
+
+void	print_files(t_ls *ctx, t_list *files)
+{
+	t_dir			*n;
+	unsigned short	i;
+	struct winsize	w;
+	unsigned short	files_per_line;
+	size_t			max;
+	t_list			*node;
+
+	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+	// if (dir->denied)
+	// {
+	// 	ft_printf("ls: %s: Permission denied\n", dir->name);
+	// 	return ;
+	// }
+	if (!GET_ALL(ctx->flags))
+		files = ft_lstfilter(files, find_hidden, remove_hidden);
+	max = *(size_t*)ft_lstfoldl(get_max_width, files);
+	files_per_line = (w.ws_col ? w.ws_col : 80) / (max ? max : 10);
+	if (GET_LONG(ctx->flags))
+	{
+		print_long_listings(files, NULL);
+		return ;
+	}
+	node = ft_lsttail(&files);
+	while (node)
+	{
+		i = 0;
+		n = (t_dir*)node->content;
+		if (GET_NL(ctx->flags))
+		{
+			ft_printf("%s\n", n->name);
+			node = ft_lsttail(&files);
+		}
+		else
+		{
+			while (node && i++ < files_per_line)
+			{
+				n = (t_dir*)node->content;
+				ft_printf("%-*s ", (int)max, n->name);
+				node = ft_lsttail(&files);
+			}
+			write(STDOUT, "\n\n", 2);
+		}
 	}
 }
 
@@ -112,31 +171,43 @@ void	print_dir(t_ls *ctx, t_dir *dir)
 	unsigned short	files_per_line;
 
 	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+	if (!dir->root || (dir->root && ctx->top_lvl_dirs > 1))
+		ft_printf("\n%s:\n", dir->full);
+	if (dir->denied)
+	{
+		ft_printf("ls: %s: Permission denied\n", dir->name);
+		return ;
+	}
 	if (!GET_ALL(ctx->flags))
 		dir->files = ft_lstfilter(dir->files, find_hidden, remove_hidden);
 	if (GET_LONG(ctx->flags))
 	{
-		print_long_listing(dir);
+		print_long_listings(dir->files, (dir->total_out = ft_itoa(dir->total)));
 		return ;
 	}
 	files_per_line = (w.ws_col ? w.ws_col : 80)
 		/ (dir->name_width ? dir->name_width : LEN(dir->name, 0));
 	node = ft_lsttail(&dir->files);
-	if (!dir->root || (dir->root && ctx->top_lvl_dirs > 1))
-	{
-		write(STDOUT, dir->full, LEN(dir->full, 0));
-		write(STDOUT, ":\n", 1);
-	}
 	while (node)
 	{
 		i = 0;
 		n = (t_dir*)node->content;
-		while (node && i++ < files_per_line)
+		if (GET_NL(ctx->flags))
 		{
-			n = (t_dir*)node->content;
-			ft_printf("%-*s ", (int)dir->name_width, n->name);
+			ft_printf("%s\n", n->name);
 			node = ft_lsttail(&dir->files);
 		}
-		write(STDOUT, "\n\n", 2);
+		else
+		{
+			while (node && i++ < files_per_line)
+			{
+				n = (t_dir*)node->content;
+				ft_printf("%-*s ", (int)dir->name_width, n->name);
+				node = ft_lsttail(&dir->files);
+			}
+			write(STDOUT, "\n", 1);
+			if (node)
+				write(STDOUT, "\n", 1);
+		}
 	}
 }

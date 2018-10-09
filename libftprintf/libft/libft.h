@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/16 12:34:43 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/06 12:50:39 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/07 17:19:09 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -297,8 +297,9 @@ t_list					*ft_lstmergesort(int (*f)(void *first, void *second),
 									t_list *list, int reverse, size_t size);
 t_list					*ft_lstsplit(t_list *list, int index);
 t_list					*ft_lstfilter(t_list *list
-							, int (*f)(t_list *elem)
-							, void (*del)(t_list *elem));
+									, int (*f)(t_list *elem)
+									, void (*del)(t_list *elem));
+t_list					*ft_lstseparate(t_list **list, int (*f)(t_list *elem));
 
 /*
 ** List functions

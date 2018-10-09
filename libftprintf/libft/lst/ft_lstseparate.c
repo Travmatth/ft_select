@@ -1,49 +1,54 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_lstfilter.c                                     :+:      :+:    :+:   */
+/*   ft_lstseparate.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/04/18 21:00:41 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/07 17:17:26 by tmatthew         ###   ########.fr       */
+/*   Created: 2018/10/07 17:11:16 by tmatthew          #+#    #+#             */
+/*   Updated: 2018/10/07 17:23:05 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../libft.h"
 
 /*
-** ft_lstfilter
+** ft_lstseparate
 ** Description Iterates list and applies the function *f to each link.
-** Removes nodes that return true from the list, deletes node by passing to *d
+** Separates nodes that return true from the list
+** Sets original list given to nodes that returned false
 ** Param. #1 A pointer to the first link of a list.
-** Param. #2 The address of filter function to apply to each link of a list.
+** Param. #2 The address of separate function to apply to each link of a list.
 ** Param. #3 The address of delete function to apply to removed links.
-** Return value the given list, with specified nodes removed and deleted.
+** Return value the given list, with specified nodes that returned true
 ** Libc functions None.
 */
 
-t_list	*ft_lstfilter(t_list *list, int (*f)(t_list *elem),
-		void (*del)(t_list *elem))
+t_list	*ft_lstseparate(t_list **list, int (*f)(t_list *elem))
 {
 	t_list	*result;
+	t_list	*current;
+	t_list	*orig;
 	t_list	*next;
 
 	result = NULL;
-	while (list)
+	orig = NULL;
+	current = *list;
+	while (current)
 	{
-		next = list->next;
-		if (!f(list))
+		next = current->next;
+		if (f(current))
 		{
-			list->next = NULL;
-			ft_lstpushback(&result, list);
+			current->next = NULL;
+			ft_lstpushback(&result, current);
 		}
 		else
 		{
-			del(list);
-			free(list);
+			current->next = NULL;
+			ft_lstpushback(&orig, current);
 		}
-		list = next;
+		current = next;
 	}
+	*list = orig;
 	return (result);
 }

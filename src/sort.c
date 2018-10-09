@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/30 18:55:12 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/06 14:23:30 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/08 11:59:18 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,24 @@
 
 int		sort_access(void *first, void *second)
 {
-	t_dir *f;
-	t_dir *s;
+	t_dir	*f;
+	t_dir	*s;
+	char	*first_name;
+	char	*second_name;
+	int		sort;
 
 	f = (t_dir*)first;
 	s = (t_dir*)second;
-	return (f->atime - s->atime);
+	if (f->atime != s->atime)
+		return ((int)(f->atime >= s->atime));
+	if (f->atime_nsec != s->atime_nsec)
+		return ((int)(f->atime >= s->atime));
+	first_name = ((t_dir*)f)->full ? ((t_dir*)f)->full : ((t_dir*)f)->name;
+	second_name = ((t_dir*)s)->full ? ((t_dir*)s)->full : ((t_dir*)s)->name;
+	sort = ft_strcmp(first_name, second_name);
+	if (sort <= 0)
+		return (1);
+	return (0);
 }
 
 /*
@@ -36,12 +48,24 @@ int		sort_access(void *first, void *second)
 
 int		sort_time(void *first, void *second)
 {
-	t_dir *f;
-	t_dir *s;
+	t_dir	*f;
+	t_dir	*s;
+	char	*first_name;
+	char	*second_name;
+	int		sort;
 
 	f = (t_dir*)first;
 	s = (t_dir*)second;
-	return (f->mtime - s->mtime);
+	if (f->mtime != s->mtime)
+		return ((int)(f->mtime >= s->mtime));
+	if (f->mtime_nsec != s->mtime_nsec)
+		return ((int)(f->mtime >= s->mtime));
+	first_name = ((t_dir*)f)->full ? ((t_dir*)f)->full : ((t_dir*)f)->name;
+	second_name = ((t_dir*)s)->full ? ((t_dir*)s)->full : ((t_dir*)s)->name;
+	sort = ft_strcmp(first_name, second_name);
+	if (sort <= 0)
+		return (1);
+	return (0);
 }
 
 int		sort_alpha(void *first, void *second)

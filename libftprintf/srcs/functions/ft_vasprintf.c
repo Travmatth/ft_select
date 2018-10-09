@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/03 18:27:52 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/06/26 15:40:26 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/09 00:33:18 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ static int		yield_str(t_buf *b, void *p)
 {
 	if (!b)
 		return (0);
-	if (!(*(char**)p = ft_memdup(b->buf, b->current)))
+	else if ((*(char**)p = ft_strndup(b->buf, b->current)))
 		return ((int)b->current);
 	else
 		return (-1);

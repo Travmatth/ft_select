@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/30 18:56:11 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/06 18:54:34 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/09 00:38:35 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,17 +19,19 @@ void	harvest_node(t_ls *ctx, t_dir *node, struct stat *attribs)
 	struct group	*gr;
 
 	node->dir = S_ISDIR(attribs->st_mode);
+	node->mtime = attribs->st_mtimespec.tv_sec;
+	node->mtime_nsec = attribs->st_mtimespec.tv_nsec;
+	node->atime = attribs->st_atimespec.tv_sec;
+	node->atime_nsec = attribs->st_atimespec.tv_nsec;
 	if (!GET_LONG(ctx->flags))
 		return ;
 	node->mode = attribs->st_mode;
 	node->date = ctime(&attribs->st_mtimespec.tv_sec);
-	node->mtime = attribs->st_mtimespec.tv_nsec;
-	node->atime = attribs->st_atimespec.tv_nsec;
 	node->links = ft_itoa(attribs->st_nlink);
 	if ((pw = getpwuid(attribs->st_uid)))
-		node->owner_name = pw->pw_name;
+		node->owner_name = ft_strdup(pw->pw_name);
 	if ((gr = getgrgid(attribs->st_gid)))
-		node->owner_group = gr->gr_name;
+		node->owner_group = ft_strdup(gr->gr_name);
 	node->size = ft_itoa(attribs->st_size);
 }
 
@@ -92,13 +94,20 @@ void	harvest_dir(t_ls *ctx, t_dir *dir)
 	struct stat		attribs;
 
 	dirs = NULL;
-	if ((dr = opendir((dir->full = form_dir(dir, dir->name)))))
+	errno = 0;
+	if (dir->dir && (dr = opendir((dir->full = form_dir(dir, dir->name)))))
 	{
 		while ((d = readdir(dr)))
 		{
 			ft_bzero(&node, sizeof(t_dir));
 			if (ERR(lstat((node.full = form_path(dir, d->d_name)), &attribs)))
+			{
+				if (errno == EACCES)
+					dir->denied = 1;
 				continue ;
+			}
+			if (!ft_strequ(".", d->d_name) && !ft_strequ("..", d->d_name))
+				dir->total += attribs.st_blocks;
 			harvest_node(ctx, &node, &attribs);
 			if (add_dir_name(dir, d->d_name, &node) && GET_RECURSE(ctx->flags))
 				ft_lstpushback(&dirs, ft_lstnew((void*)&node, sizeof(t_dir)));
@@ -109,8 +118,12 @@ void	harvest_dir(t_ls *ctx, t_dir *dir)
 			, dirs, !GET_REVERSE(ctx->flags), ft_lstsize(dirs));
 		dir->files = ft_lstmergesort(ctx->compare
 			, dir->files, !GET_REVERSE(ctx->flags), ft_lstsize(dir->files));
+		if (!GET_ALL(ctx->flags))
+			dirs = ft_lstfilter(dirs, find_hidden, remove_hidden);
 		ft_lstmerge(&ctx->stack, dirs);
 	}
+	else if (errno == EACCES)
+		dir->denied = 1;
 }
 
 /*
@@ -121,12 +134,20 @@ void	crawl_files(t_ls *ctx)
 {
 	int		rev;
 	t_list	*d;
+	t_list	*files;
+	size_t	len;
 
 	rev = !GET_REVERSE(ctx->flags);
 	ctx->compare = sort_alpha;
 	GET_SORT_ACCESS(ctx->flags) ? (ctx->compare = sort_access) : NULL;
 	GET_SORT_TIME(ctx->flags) ? (ctx->compare = sort_time) : NULL;
-	ctx->stack = ft_lstmergesort(ctx->compare, ctx->stack, rev, ft_lstsize(ctx->stack));
+	files = ft_lstseparate(&ctx->stack, find_files);
+	len = ft_lstsize(files);
+	files = ft_lstmergesort(ctx->compare, files, rev, len);
+	len = ft_lstsize(ctx->stack);
+	ctx->stack = ft_lstmergesort(ctx->compare, ctx->stack, rev, len);
+	if (files)
+		print_files(ctx, files);
 	while (ctx->stack)
 	{
 		d = ft_lsttail(&ctx->stack);

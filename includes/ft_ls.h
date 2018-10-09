@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:08:47 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/06 18:55:53 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/08 23:57:34 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@
 # include <dirent.h>
 # include <sys/stat.h>
 #include <sys/ioctl.h>
+#include <sys/types.h>
+#include <errno.h>
 
 # define SET_LONG(v) (BITSET(v, 0))
 # define SET_RECURSE(v) (BITSET(v, 1))
@@ -32,7 +34,7 @@
 # define SET_DISPL_GRP(v) (BITSET(v, 7))
 # define SET_NO_RECURSE(v) (BITSET(v, 8))
 # define SET_COLOR_OUT(v) (BITSET(v, 9))
-# define SET_DIR(v) (BITSET(v, 10))
+# define SET_NL(v) (BITSET(v, 10))
 
 # define GET_LONG(v) (BITTEST(v, 0))
 # define GET_RECURSE(v) (BITTEST(v, 1))
@@ -44,7 +46,7 @@
 # define GET_DISPL_GRP(v) (BITTEST(v, 7))
 # define GET_NO_RECURSE(v) (BITTEST(v, 8))
 # define GET_COLOR_OUT(v) (BITTEST(v, 9))
-# define GET_DIR(v) (BITTEST(v, 10))
+# define GET_NL(v) (BITTEST(v, 10))
 
 typedef struct	s_lsopt
 {
@@ -52,19 +54,6 @@ typedef struct	s_lsopt
 	int			position;
 }				t_lsopt;
 
-// typedef struct	s_width
-// {
-// 	size_t		name;
-// 	size_t		parent;
-// 	size_t		link;
-// 	size_t		size;
-// 	size_t		owner_name;
-// 	size_t		owner_group;
-// 	size_t		file_size;
-// 	size_t		day;
-// }				t_width;
-
-#include <sys/types.h>
 
 typedef struct	s_dir
 {
@@ -76,15 +65,21 @@ typedef struct	s_dir
 	char		*owner_group;
 	char		*size;
 	char		*date;
+	char		*total_out;
+	char		*date_str;
+	char		*name_str;
 	size_t		name_width;
 	size_t		parent_width;
 	t_list		*files;
 	long		atime;
+	long		atime_nsec;
 	long		mtime;
+	long		mtime_nsec;
 	int			dir;
 	int			root;
+	int			denied;
 	mode_t		mode;
-	char		*total;
+	int			total;
 }				t_dir;
 
 typedef struct	s_ls
@@ -95,14 +90,19 @@ typedef struct	s_ls
 	int			top_lvl_dirs;
 }				t_ls;
 
+void			*get_max_width(void *final, t_list *elem, size_t i, int *stop);
+int				find_files(t_list *elem);
+int				find_hidden(t_list *elem);
+void			free_dir(t_dir *dir);
+void			remove_hidden(t_list *elem);
 void			*find_link(void *final, t_list *elem, size_t i, int *stop);
 void			*find_name(void *final, t_list *elem, size_t i, int *stop);
 void			*find_grp(void *final, t_list *elem, size_t i, int *stop);
 void			*find_size(void *final, t_list *elem, size_t i, int *stop);
 int				*find_widths(t_list *lst, int widths[5]);
-void			ft_ls_usage(void);
 void			crawl_files(t_ls *ctx);
 void			print_dir(t_ls *ctx, t_dir *dir);
+void			print_files(t_ls *ctx, t_list *files);
 void			harvest_node(t_ls *ctx
 							, t_dir *node
 							, struct stat *attribs);
