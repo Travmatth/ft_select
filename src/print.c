@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/30 18:54:23 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/09 00:24:37 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/09 00:52:00 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ char	*format_permissions(t_dir *file)
 
 	out = ft_strdup(permissions);
 	out[0] = S_ISDIR(file->mode) ? 'd' : '-';
+	out[0] = S_ISLNK(file->mode) ? 'l' : out[0];
 	out[1] = file->mode & S_IRUSR ? 'r' : '-';
 	out[2] = file->mode & S_IWUSR ? 'w' : '-';
 	out[3] = file->mode & S_IXUSR ? 'x' : '-';
