@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:08:47 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/09 16:05:09 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/09 22:26:05 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,7 @@ typedef struct	s_dir
 	char		*total_out;
 	char		*date_str;
 	char		*name_str;
+	char		*format_str;
 	size_t		name_width;
 	size_t		parent_width;
 	t_list		*files;
@@ -97,7 +98,7 @@ typedef struct	s_ls
 void			*get_max_width(void *final, t_list *elem, size_t i, int *stop);
 int				find_files(t_list *elem);
 int				find_hidden(t_list *elem);
-void			free_dir(t_dir *dir);
+void			free_dir(void *d, size_t len);
 void			remove_hidden(t_list *elem);
 void			*find_link(void *final, t_list *elem, size_t i, int *stop);
 void			*find_name(void *final, t_list *elem, size_t i, int *stop);

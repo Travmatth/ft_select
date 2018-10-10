@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/30 18:56:11 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/09 17:46:32 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/10 00:49:30 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,9 @@ void	harvest_node(t_ls *ctx, t_dir *node, struct stat *attribs)
 	node->mtime_nsec = attribs->st_mtimespec.tv_nsec;
 	node->atime = attribs->st_atimespec.tv_sec;
 	node->atime_nsec = attribs->st_atimespec.tv_nsec;
+	node->mode = attribs->st_mode;
 	if (!GET_LONG(ctx->flags))
 		return ;
-	node->mode = attribs->st_mode;
 	node->date = ctime(&attribs->st_mtimespec.tv_sec);
 	node->links = ft_itoa(attribs->st_nlink);
 	if ((pw = getpwuid(attribs->st_uid)))
@@ -93,6 +93,25 @@ void	add_to_total(t_ls *ctx, char *name, t_dir *dir, int size)
 		dir->total += size;
 }
 
+void	deduplicate_node(t_list *node)
+{
+	t_dir *n;
+
+	n = (t_dir*)node->content;
+	n->name = ft_strdup(n->name);
+	n->parent = ft_strdup(n->parent);
+	n->full = ft_strdup(n->full);
+	n->links = ft_strdup(n->links);
+	n->owner_name = ft_strdup(n->owner_name);
+	n->owner_group = ft_strdup(n->owner_group);
+	n->size = ft_strdup(n->size);
+	n->date = ft_strdup(n->date);
+	n->total_out = ft_strdup(n->total_out);
+	n->date_str = ft_strdup(n->date_str);
+	n->name_str = ft_strdup(n->name_str);
+	n->format_str = ft_strdup(n->format_str);
+}
+
 void	harvest_dir(t_ls *ctx, t_dir *dir)
 {
 	t_list			*dirs;
@@ -117,7 +136,10 @@ void	harvest_dir(t_ls *ctx, t_dir *dir)
 			add_to_total(ctx, d->d_name, dir, attribs.st_blocks);
 			harvest_node(ctx, &node, &attribs);
 			if (add_dir_name(dir, d->d_name, &node) && GET_RECURSE(ctx->flags))
+			{
 				ft_lstpushback(&dirs, ft_lstnew((void*)&node, sizeof(t_dir)));
+				deduplicate_node(ft_lstlast(dirs));
+			}
 			ft_lstpushback(&dir->files, ft_lstnew((void*)&node, sizeof(t_dir)));
 		}
 		closedir(dr);
@@ -126,7 +148,7 @@ void	harvest_dir(t_ls *ctx, t_dir *dir)
 		dir->files = ft_lstmergesort(ctx->compare
 			, dir->files, !GET_REVERSE(ctx->flags), ft_lstsize(dir->files));
 		if (!GET_ALL(ctx->flags))
-			dirs = ft_lstfilter(dirs, find_hidden, remove_hidden);
+			dirs = ft_lstfilter(dirs, find_hidden, free_dir);
 		ft_lstmerge(&ctx->stack, dirs);
 	}
 	else if (errno == EACCES)
@@ -161,5 +183,6 @@ void	crawl_files(t_ls *ctx)
 		d = ft_lsttail(&ctx->stack);
 		harvest_dir(ctx, (t_dir*)d->content);
 		print_dir(ctx, (t_dir*)d->content);
+		ft_lstdel(&d, free_dir);
 	}
 }

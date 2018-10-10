@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:06:46 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/09 17:30:14 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/10 00:58:53 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,8 +59,9 @@ void	locate_file(t_ls *ctx, char *dirname, char *files)
 	*files = 1;
 	ctx->top_lvl_dirs += 1;
 	ft_bzero((void*)&d, sizeof(t_dir));
-	d.name = dirname;
-	d.parent = dirname;
+	d.name = ft_strdup(dirname);
+	d.parent = ft_strdup(dirname);
+	d.full = dirname;
 	d.root = 1;
 	d.dir = GET_NO_RECURSE(ctx->flags) ? 0 : 1;
 	if ((dir = opendir(dirname)))
@@ -149,5 +150,8 @@ int		main(int argc, char **argv)
 	ft_bzero(&ctx, sizeof(t_ls));
 	parse_opts(&ctx, argc, argv);
 	crawl_files(&ctx);
+	// TEST SHIM
+	while (1) ;
+	// TEST SHIM
 	return (0);
 }

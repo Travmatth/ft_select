@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/07 15:16:48 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/09 16:42:52 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/09 23:26:50 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,14 +26,39 @@ int		find_hidden(t_list *elem)
 	return (0);
 }
 
-void	free_dir(t_dir *dir)
+void	free_dir(void *d, size_t len)
 {
-	(void)dir;
+	t_dir	*dir;
+
+	(void)len;
+	dir = (t_dir*)d;
+	free(dir->name);
+	free(dir->parent);
+	free(dir->full);
+	if (dir->links)
+		free(dir->links);
+	if (dir->owner_name)
+		free(dir->owner_name);
+	if (dir->owner_group)
+		free(dir->owner_group);
+	if (dir->size)
+		free(dir->size);
+	if (dir->total_out)
+		free(dir->total_out);
+	if (dir->date_str)
+		free(dir->date_str);
+	if (dir->name_str)
+		free(dir->name_str);
+	if (dir->format_str)
+		free(dir->format_str);
+	if (dir->files)
+		ft_lstdel(&dir->files, free_dir);
+	free(d);
 }
 
 void	remove_hidden(t_list *elem)
 {
-	free_dir((t_dir*)elem->content);
+	free_dir(elem->content, elem->content_size);
 }
 
 int		find_files(t_list *elem)

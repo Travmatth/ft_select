@@ -6,7 +6,7 @@
 #    By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/05/17 18:33:21 by tmatthew          #+#    #+#              #
-#    Updated: 2018/09/12 18:54:45 by tmatthew         ###   ########.fr        #
+#    Updated: 2018/10/09 23:09:53 by tmatthew         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,6 +17,9 @@ ifeq "$(TEST)" "FULL"
 	DEBUG = -g -fsanitize=address -fsanitize=undefined
 else
 	DEBUG =
+endif
+ifdef LEAKS
+        DEBUG = -g
 endif
 
 LIBFT = libft

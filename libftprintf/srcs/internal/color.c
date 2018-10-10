@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/21 18:21:34 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/06 13:21:41 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/09 21:42:45 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,4 +70,5 @@ void	add_color_codes(t_fmt *fmt)
 			fmt->out = tmp;
 		}
 	}
+	fmt->len.out = LEN(fmt->out, 0);
 }

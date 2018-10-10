@@ -6,26 +6,74 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/30 18:54:23 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/09 15:35:19 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/10 00:49:09 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ft_ls.h"
 
-/*
-**	print dir contents
-*/
+static	char	*g_permissions = "----------";
 
-static	char 	*permissions = "----------";
+char	*format_color(char *template, t_dir *node)
+{
+	char	*fmt;
+	char	*spec;
+	char	*out;
+	size_t	start;
+	size_t	end;
+
+	if (S_ISLNK(node->mode))
+		fmt = "{purple}";
+	else if (S_ISDIR(node->mode))
+		fmt = "{b_blue}";
+	else if (S_ISBLK(node->mode))
+		fmt = "{blue}";
+	else if (S_ISCHR(node->mode))
+		fmt = "{yellow}";
+	else if (S_ISSOCK(node->mode))
+		fmt = "{green}";
+	else if (S_ISFIFO(node->mode))
+		fmt = "{b_cyan}";
+	else if (node->mode & S_IXUSR)
+		fmt = "{red}";
+	else if (S_ISREG(node->mode))
+		return (ft_strdup(template));
+	if (ft_count_char(template, '%') <= 2)
+	{
+		start = ft_strchr(template, '%') - template;
+		end = ft_strchr(template, 's') - template + 1;
+		spec = ft_strsub(template, (unsigned int)start, end);
+		fmt = ft_strjoin(fmt, spec);
+		out = ft_strjoin(fmt, "{eoc}");
+		free(fmt);
+		fmt = out;
+		out = ft_swap(template, spec, fmt);
+		free(fmt);
+		free(spec);
+		return (out);
+	}
+	out = ft_strjoin(fmt, "%s");
+	if (S_ISLNK(node->mode))
+		fmt = ft_strjoin(out, "{eoc} -> %s");
+	else
+		fmt = ft_strjoin(out, "{eoc}");
+	free(out);
+	out = ft_strjoin(template, fmt);
+	free(fmt);
+	return (out);
+}
 
 char	*format_permissions(t_dir *file)
 {
 	char *out;
 
-	out = ft_strdup(permissions);
+	out = ft_strdup(g_permissions);
 	out[0] = S_ISDIR(file->mode) ? 'd' : '-';
 	out[0] = S_ISLNK(file->mode) ? 'l' : out[0];
+	out[0] = S_ISBLK(file->mode) ? 'b' : out[0];
 	out[0] = S_ISCHR(file->mode) ? 'c' : out[0];
+	out[0] = S_ISSOCK(file->mode) ? 's' : out[0];
+	out[0] = S_ISFIFO(file->mode) ? 'p' : out[0];
 	out[1] = file->mode & S_IRUSR ? 'r' : '-';
 	out[2] = file->mode & S_IWUSR ? 'w' : '-';
 	out[3] = file->mode & S_IXUSR ? 'x' : '-';
@@ -46,8 +94,9 @@ char	*format_permissions(t_dir *file)
 
 char	*format_date(char *date)
 {
-	char *out;
-	char **parts;
+	char	*out;
+	char	**parts;
+	size_t	i;
 
 	parts = ft_strsplit(date, ' ');
 	out = ft_strnew(12);
@@ -66,13 +115,17 @@ char	*format_date(char *date)
 	}
 	out[6] = ' ';
 	ft_memcpy((void*)(out + 7), parts[3], 5);
+	i = 4;
+	while (i)
+		free(parts[i--]);
+	free(parts[0]);
+	free(parts);
 	return (out);
 }
 
 char	*format_name(t_dir *node)
 {
 	char	buf[256];
-	char	*out;
 	ssize_t	bytes;
 	char	*name;
 
@@ -81,8 +134,7 @@ char	*format_name(t_dir *node)
 	ft_bzero(buf, 256);
 	name = node->full ? node->full : node->name;
 	bytes = readlink(name, buf, 255);
-	ft_asprintf(&out, "%s -> %s", name, buf);
-	return (out);
+	return (ft_strdup(buf));
 }
 
 void	print_long_listings(t_list *lst, char *totals)
@@ -109,13 +161,16 @@ void	print_long_listings(t_list *lst, char *totals)
 				perms = format_permissions(n);
 				n->date_str = format_date(n->date);
 				n->name_str = format_name(n);
-				ft_printf("%s  %*s %*s  %*s  %*s %s %s", perms, widths[0], n->links
+				n->format_str = format_color("%s  %*s %*s  %*s  %*s %s ", n);
+				ft_printf(n->format_str, perms, widths[0], n->links
 					, widths[1], n->owner_name
 					, widths[2], n->owner_group
 					, widths[3], n->size
-					, n->date_str, n->name_str);
+					, n->date_str, n->name, n->name_str);
+				free(perms);
 			}
 			write(STDOUT, "\n", 1);
+			ft_lstdel(&node, free_dir);
 			node = ft_lsttail(&lst);
 		}
 		if (node)
@@ -132,11 +187,12 @@ void	print_files(t_ls *ctx, t_list *files)
 	void			*max;
 	t_list			*node;
 
-	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 	if (!GET_ALL(ctx->flags))
-		files = ft_lstfilter(files, find_hidden, remove_hidden);
+		files = ft_lstfilter(files, find_hidden, free_dir);
+	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 	max = ft_lstfoldl(get_max_width, files);
 	files_per_line = (w.ws_col ? w.ws_col : 80) / (max ? *(size_t*)max : 10);
+	free(max);
 	if (GET_LONG(ctx->flags))
 	{
 		print_long_listings(files, NULL);
@@ -149,7 +205,9 @@ void	print_files(t_ls *ctx, t_list *files)
 		n = (t_dir*)node->content;
 		if (GET_NL(ctx->flags))
 		{
-			ft_printf("%s\n", n->name);
+			n->format_str = format_color("%s\n", n);
+			ft_printf(n->format_str, n->name);
+			ft_lstdel(&node, free_dir);
 			node = ft_lsttail(&files);
 		}
 		else
@@ -157,7 +215,9 @@ void	print_files(t_ls *ctx, t_list *files)
 			while (node && i++ < files_per_line)
 			{
 				n = (t_dir*)node->content;
-				ft_printf("%-*s ", (int)max, n->name);
+				n->format_str = format_color("%-*s ", n);
+				ft_printf(n->format_str, (int)max, n->name);
+				ft_lstdel(&node, free_dir);
 				node = ft_lsttail(&files);
 			}
 			write(STDOUT, "\n\n", 2);
@@ -182,7 +242,7 @@ void	print_dir(t_ls *ctx, t_dir *dir)
 		return ;
 	}
 	if (!GET_ALL(ctx->flags))
-		dir->files = ft_lstfilter(dir->files, find_hidden, remove_hidden);
+		dir->files = ft_lstfilter(dir->files, find_hidden, free_dir);
 	if (GET_LONG(ctx->flags))
 	{
 		print_long_listings(dir->files, (dir->total_out = ft_itoa(dir->total)));
@@ -197,7 +257,9 @@ void	print_dir(t_ls *ctx, t_dir *dir)
 		n = (t_dir*)node->content;
 		if (GET_NL(ctx->flags))
 		{
-			ft_printf("%s\n", n->name);
+			n->format_str = format_color("%s\n", n);
+			ft_printf(n->format_str, n->name);
+			ft_lstdel(&node, free_dir);
 			node = ft_lsttail(&dir->files);
 		}
 		else
@@ -205,7 +267,9 @@ void	print_dir(t_ls *ctx, t_dir *dir)
 			while (node && i++ < files_per_line)
 			{
 				n = (t_dir*)node->content;
-				ft_printf("%-*s ", (int)dir->name_width, n->name);
+				n->format_str = format_color("%-*s ", n);
+				ft_printf(n->format_str, (int)dir->name_width, n->name);
+				ft_lstdel(&node, free_dir);
 				node = ft_lsttail(&dir->files);
 			}
 			write(STDOUT, "\n", 1);

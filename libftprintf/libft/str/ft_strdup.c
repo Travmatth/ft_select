@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/18 19:39:26 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/06/24 21:58:04 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/10 00:27:33 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ char	*ft_strdup(const char *s1)
 
 	if (!s1)
 		return (NULL);
-	len = ft_strlen(s1);
+	len = LEN(s1, 0);
 	if (!(dest = ft_strnew(len)))
 		return (NULL);
 	return (ft_memcpy(dest, s1, len));

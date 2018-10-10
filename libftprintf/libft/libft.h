@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/16 12:34:43 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/07 17:19:09 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/09 23:18:56 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -298,7 +298,7 @@ t_list					*ft_lstmergesort(int (*f)(void *first, void *second),
 t_list					*ft_lstsplit(t_list *list, int index);
 t_list					*ft_lstfilter(t_list *list
 									, int (*f)(t_list *elem)
-									, void (*del)(t_list *elem));
+									, void (*del)(void *, size_t));
 t_list					*ft_lstseparate(t_list **list, int (*f)(t_list *elem));
 
 /*
@@ -309,7 +309,6 @@ t_list					*ft_lstseparate(t_list **list, int (*f)(t_list *elem));
 ** t_list *ft_lstmap(t_list *lst, t_list *(*f)(t_list *elem));
 ** t_list *ft_lstjoin(t_list *lst, t_list *(*f)(t_list *elem));
 ** t_list *ft_lstiter(t_list *lst, t_list *(*f)(t_list *elem));
-** t_list *ft_lstfilter(t_list *lst, t_list *(*f)(t_list *elem));
 ** t_list *ft_lstfold(t_list *lst, t_list *(*f)(t_list *elem));
 ** t_list *ft_lstfold(t_list *lst, t_list *(*f)(t_list *elem));
 ** t_list *ft_lstfold_new(t_list *lst, t_list *(*f)(t_list *elem));

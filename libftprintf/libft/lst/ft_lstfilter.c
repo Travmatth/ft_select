@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/18 21:00:41 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/07 17:17:26 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/09 23:20:53 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@
 */
 
 t_list	*ft_lstfilter(t_list *list, int (*f)(t_list *elem),
-		void (*del)(t_list *elem))
+		void (*del)(void *, size_t))
 {
 	t_list	*result;
 	t_list	*next;
@@ -39,10 +39,7 @@ t_list	*ft_lstfilter(t_list *list, int (*f)(t_list *elem),
 			ft_lstpushback(&result, list);
 		}
 		else
-		{
-			del(list);
-			free(list);
-		}
+			ft_lstdelone(&list, del);
 		list = next;
 	}
 	return (result);
