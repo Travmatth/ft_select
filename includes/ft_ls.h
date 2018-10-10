@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:08:47 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/08 23:57:34 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/09 16:05:09 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,9 +20,9 @@
 # include "../libftprintf/srcs/includes/ft_printf.h"
 # include <dirent.h>
 # include <sys/stat.h>
-#include <sys/ioctl.h>
-#include <sys/types.h>
-#include <errno.h>
+# include <sys/ioctl.h>
+# include <sys/types.h>
+# include <errno.h>
 
 # define SET_LONG(v) (BITSET(v, 0))
 # define SET_RECURSE(v) (BITSET(v, 1))
@@ -47,6 +47,10 @@
 # define GET_NO_RECURSE(v) (BITTEST(v, 8))
 # define GET_COLOR_OUT(v) (BITTEST(v, 9))
 # define GET_NL(v) (BITTEST(v, 10))
+
+# define USR_OR_STICK (S_ISUID | S_IXUSR)
+# define GRP_OR_STICK (S_ISGID | S_IXGRP)
+# define OTH_OR_STICK (S_IXOTH | S_ISVTX)
 
 typedef struct	s_lsopt
 {
@@ -109,4 +113,5 @@ void			harvest_node(t_ls *ctx
 int				sort_access(void *first, void *second);
 int				sort_time(void *first, void *second);
 int				sort_alpha(void *first, void *second);
+int				sort_null(void *first, void *second);
 #endif

@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/30 18:54:23 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/09 00:52:00 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/09 15:35:19 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,15 +25,22 @@ char	*format_permissions(t_dir *file)
 	out = ft_strdup(permissions);
 	out[0] = S_ISDIR(file->mode) ? 'd' : '-';
 	out[0] = S_ISLNK(file->mode) ? 'l' : out[0];
+	out[0] = S_ISCHR(file->mode) ? 'c' : out[0];
 	out[1] = file->mode & S_IRUSR ? 'r' : '-';
 	out[2] = file->mode & S_IWUSR ? 'w' : '-';
 	out[3] = file->mode & S_IXUSR ? 'x' : '-';
+	out[3] = (file->mode & (USR_OR_STICK)) == S_ISUID ? 'S' : out[3];
+	out[3] = (file->mode & (USR_OR_STICK)) == (USR_OR_STICK) ? 's' : out[3];
 	out[4] = file->mode & S_IRGRP ? 'r' : '-';
 	out[5] = file->mode & S_IWGRP ? 'w' : '-';
 	out[6] = file->mode & S_IXGRP ? 'x' : '-';
+	out[6] = (file->mode & (GRP_OR_STICK)) == S_ISGID ? 'S' : out[6];
+	out[6] = (file->mode & (GRP_OR_STICK)) == (GRP_OR_STICK) ? 's' : out[6];
 	out[7] = file->mode & S_IROTH ? 'r' : '-';
 	out[8] = file->mode & S_IWOTH ? 'w' : '-';
 	out[9] = file->mode & S_IXOTH ? 'x' : '-';
+	out[9] = (file->mode & (OTH_OR_STICK)) == S_ISVTX ? 'T' : out[9];
+	out[9] = (file->mode & (OTH_OR_STICK)) == (OTH_OR_STICK) ? 't' : out[9];
 	return (out);
 }
 
@@ -87,7 +94,7 @@ void	print_long_listings(t_list *lst, char *totals)
 
 	find_widths(lst, widths);
 	node = ft_lsttail(&lst);
-	if (totals)
+	if (totals && node)
 		ft_printf("total %s\n", totals);
 	while (node)
 	{
@@ -122,19 +129,14 @@ void	print_files(t_ls *ctx, t_list *files)
 	unsigned short	i;
 	struct winsize	w;
 	unsigned short	files_per_line;
-	size_t			max;
+	void			*max;
 	t_list			*node;
 
 	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-	// if (dir->denied)
-	// {
-	// 	ft_printf("ls: %s: Permission denied\n", dir->name);
-	// 	return ;
-	// }
 	if (!GET_ALL(ctx->flags))
 		files = ft_lstfilter(files, find_hidden, remove_hidden);
-	max = *(size_t*)ft_lstfoldl(get_max_width, files);
-	files_per_line = (w.ws_col ? w.ws_col : 80) / (max ? max : 10);
+	max = ft_lstfoldl(get_max_width, files);
+	files_per_line = (w.ws_col ? w.ws_col : 80) / (max ? *(size_t*)max : 10);
 	if (GET_LONG(ctx->flags))
 	{
 		print_long_listings(files, NULL);

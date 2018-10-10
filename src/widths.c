@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/06 18:09:50 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/06 18:31:17 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/09 14:53:20 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,23 +88,28 @@ void	*find_size(void *final, t_list *elem, size_t i, int *stop)
 	return (final);
 }
 
-int		*find_widths(t_list *lst, int widths[5])
+int		*find_widths(t_list *lst, int widths[4])
 {
 	int		i;
 	int		*tmp;
 
 	i = 0;
-	tmp = ft_lstfoldl(find_link, lst);
-	widths[0] = *tmp;
-	free(tmp);
-	tmp = ft_lstfoldl(find_name, lst);
-	widths[1] = *tmp;
-	free(tmp);
-	tmp = ft_lstfoldl(find_grp, lst);
-	widths[2] = *tmp;
-	free(tmp);
-	tmp = ft_lstfoldl(find_size, lst);
-	widths[3] = *tmp;
-	free(tmp);
+	if (!lst)
+		ft_bzero((void*)widths, sizeof(int) * 4);
+	else
+	{
+		tmp = ft_lstfoldl(find_link, lst);
+		widths[0] = *tmp;
+		free(tmp);
+		tmp = ft_lstfoldl(find_name, lst);
+		widths[1] = *tmp;
+		free(tmp);
+		tmp = ft_lstfoldl(find_grp, lst);
+		widths[2] = *tmp;
+		free(tmp);
+		tmp = ft_lstfoldl(find_size, lst);
+		widths[3] = *tmp;
+		free(tmp);
+	}
 	return (widths);
 }

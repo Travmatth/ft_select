@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/30 18:56:11 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/09 00:38:35 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/09 17:46:32 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ void	harvest_node(t_ls *ctx, t_dir *node, struct stat *attribs)
 	struct passwd	*pw;
 	struct group	*gr;
 
-	node->dir = S_ISDIR(attribs->st_mode);
+	node->dir = S_ISDIR(attribs->st_mode) && !GET_NO_RECURSE(ctx->flags) ? 1 : 0;
 	node->mtime = attribs->st_mtimespec.tv_sec;
 	node->mtime_nsec = attribs->st_mtimespec.tv_nsec;
 	node->atime = attribs->st_atimespec.tv_sec;
@@ -85,6 +85,14 @@ char	*form_path(t_dir *dir, char *name)
 	return (str);
 }
 
+void	add_to_total(t_ls *ctx, char *name, t_dir *dir, int size)
+{
+	if (name[0] == '.' && GET_ALL(ctx->flags))
+		dir->total += size;
+	else if (name[0] != '.')
+		dir->total += size;
+}
+
 void	harvest_dir(t_ls *ctx, t_dir *dir)
 {
 	t_list			*dirs;
@@ -106,8 +114,7 @@ void	harvest_dir(t_ls *ctx, t_dir *dir)
 					dir->denied = 1;
 				continue ;
 			}
-			if (!ft_strequ(".", d->d_name) && !ft_strequ("..", d->d_name))
-				dir->total += attribs.st_blocks;
+			add_to_total(ctx, d->d_name, dir, attribs.st_blocks);
 			harvest_node(ctx, &node, &attribs);
 			if (add_dir_name(dir, d->d_name, &node) && GET_RECURSE(ctx->flags))
 				ft_lstpushback(&dirs, ft_lstnew((void*)&node, sizeof(t_dir)));
@@ -139,8 +146,9 @@ void	crawl_files(t_ls *ctx)
 
 	rev = !GET_REVERSE(ctx->flags);
 	ctx->compare = sort_alpha;
-	GET_SORT_ACCESS(ctx->flags) ? (ctx->compare = sort_access) : NULL;
+	GET_NO_SORT(ctx->flags) ? (ctx->compare = sort_null) : NULL;
 	GET_SORT_TIME(ctx->flags) ? (ctx->compare = sort_time) : NULL;
+	GET_SORT_ACCESS(ctx->flags) && GET_SORT_TIME(ctx->flags) ? (ctx->compare = sort_access) : NULL;
 	files = ft_lstseparate(&ctx->stack, find_files);
 	len = ft_lstsize(files);
 	files = ft_lstmergesort(ctx->compare, files, rev, len);

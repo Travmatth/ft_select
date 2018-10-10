@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/07 15:16:48 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/08 10:47:20 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/09 16:42:52 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,13 @@ int		find_hidden(t_list *elem)
 	t_dir	*d;
 
 	d = (t_dir*)elem->content;
-	return (d->name && (d->name[0] == '.'));
+	if (d->name[0] == '.' && !d->name[1])
+		return (1);
+	if (d->name[0] == '.' && d->name[1] == '.')
+		return (1);
+	if (d->name[0] == '.' && d->name[1] != '/')
+		return (1);
+	return (0);
 }
 
 void	free_dir(t_dir *dir)

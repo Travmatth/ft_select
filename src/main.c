@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:06:46 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/08 23:40:15 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/09 17:30:14 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,15 +62,12 @@ void	locate_file(t_ls *ctx, char *dirname, char *files)
 	d.name = dirname;
 	d.parent = dirname;
 	d.root = 1;
-	d.dir = 1;
+	d.dir = GET_NO_RECURSE(ctx->flags) ? 0 : 1;
 	if ((dir = opendir(dirname)))
 	{
 		if (!ERR(lstat(dirname, &attribs)))
 		{
-			d.mtime = attribs.st_mtimespec.tv_sec;
-			d.mtime_nsec = attribs.st_mtimespec.tv_nsec;
-			d.atime = attribs.st_atimespec.tv_sec;
-			d.atime_nsec = attribs.st_atimespec.tv_nsec;
+			harvest_node(ctx, &d, &attribs);
 			closedir(dir);
 			ft_lstpushback(&ctx->stack, ft_lstnew(&d, sizeof(t_dir)));
 		}
@@ -126,7 +123,6 @@ void	parse_opts(t_ls *ctx, int argc, char **argv)
 	{
 		i = 1;
 		len = LEN(argv[n], 0);
-		ft_printf("opt: %s\n", argv[n]);
 		if (ft_strequ("--", argv[n]))
 		{
 			n += 1;
