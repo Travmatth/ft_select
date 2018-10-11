@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:06:46 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/10 00:58:53 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/10 23:02:58 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,28 +50,31 @@ void	ft_ls_usage(char opt)
 	exit(1);
 }
 
+void	set_root_dir(t_ls *ctx, t_dir *dir, char *dirname, char *files)
+{
+	*files = 1;
+	ctx->top_lvl_dirs += 1;
+	ft_bzero((void*)dir, sizeof(t_dir));
+	dir->name = ft_strdup(dirname);
+	dir->parent = ft_strdup(dirname);
+	dir->full = dirname;
+	dir->root = 1;
+	dir->dir = GET_NO_RECURSE(ctx->flags) ? 0 : 1;
+}
+
 void	locate_file(t_ls *ctx, char *dirname, char *files)
 {
 	DIR			*dir;
 	t_dir		d;
 	struct stat		attribs;
 
-	*files = 1;
-	ctx->top_lvl_dirs += 1;
-	ft_bzero((void*)&d, sizeof(t_dir));
-	d.name = ft_strdup(dirname);
-	d.parent = ft_strdup(dirname);
-	d.full = dirname;
-	d.root = 1;
-	d.dir = GET_NO_RECURSE(ctx->flags) ? 0 : 1;
-	if ((dir = opendir(dirname)))
+	errno = 0;
+	set_root_dir(ctx, &d, dirname, files);
+	if ((dir = opendir(dirname)) && !ERR(lstat(dirname, &attribs)))
 	{
-		if (!ERR(lstat(dirname, &attribs)))
-		{
-			harvest_node(ctx, &d, &attribs);
-			closedir(dir);
-			ft_lstpushback(&ctx->stack, ft_lstnew(&d, sizeof(t_dir)));
-		}
+		harvest_node(ctx, &d, &attribs);
+		closedir(dir);
+		ft_lstpushback(&ctx->stack, ft_lstnew(&d, sizeof(t_dir)));
 	}
 	else if (errno == EACCES)
 	{
@@ -111,14 +114,12 @@ void	parse_opt(t_ls *ctx, char opt)
 		ft_ls_usage(opt);
 }
 
-void	parse_opts(t_ls *ctx, int argc, char **argv)
+void	parse_opts(t_ls *ctx, int argc, char **argv, int n)
 {
-	int		n;
 	size_t	i;
 	size_t	len;
 	char	stop;
 
-	n = 1;
 	stop = 0;
 	while (n < argc)
 	{
@@ -146,12 +147,10 @@ void	parse_opts(t_ls *ctx, int argc, char **argv)
 int		main(int argc, char **argv)
 {
 	t_ls	ctx;
-
+	int		n;
+	
 	ft_bzero(&ctx, sizeof(t_ls));
-	parse_opts(&ctx, argc, argv);
+	parse_opts(&ctx, argc, argv, (n = 1));
 	crawl_files(&ctx);
-	// TEST SHIM
-	while (1) ;
-	// TEST SHIM
 	return (0);
 }
