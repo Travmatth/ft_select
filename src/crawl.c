@@ -6,12 +6,24 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/30 18:56:11 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/10 00:49:30 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/11 16:41:05 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 #include "../includes/ft_ls.h"
+
+void	set_root_dir(t_ls *ctx, t_dir *dir, char *dirname, char *files)
+{
+	*files = 1;
+	ctx->top_lvl_dirs += 1;
+	ft_bzero((void*)dir, sizeof(t_dir));
+	dir->name = ft_strdup(dirname);
+	dir->parent = ft_strdup(dirname);
+	dir->full = dirname;
+	dir->root = 1;
+	dir->dir = GET_NO_RECURSE(ctx->flags) ? 0 : 1;
+}
 
 void	harvest_node(t_ls *ctx, t_dir *node, struct stat *attribs)
 {
@@ -35,113 +47,42 @@ void	harvest_node(t_ls *ctx, t_dir *node, struct stat *attribs)
 	node->size = ft_itoa(attribs->st_size);
 }
 
-/*
-** iterate through the given directories and add their subdirs to stack,
-** add files to file linked list
-*/
-
-int		add_dir_name(t_dir *dir, char *current, t_dir *node)
+void	harvest_dir_nodes(t_ls *ctx, t_dir *dir, t_list **dirs, DIR *dr)
 {
-	size_t			len;
+	struct dirent	*d;
+	t_dir			node;
+	struct stat		attribs;
 
-	node->name = ft_strdup(current);
-	if ((len = LEN(current, 0)) > dir->name_width)
-		dir->name_width = len;
-	node->parent = ft_strdup(dir->parent);
-	if ((len = LEN(node->parent, 0)) > dir->parent_width)
-		dir->parent_width = len;
-	if (node->dir && !ft_strequ(".", current) && !ft_strequ("..", current))
-		return (1);
-	return (0);
-}
-
-char	*form_dir(t_dir *dir, char *name)
-{
-	size_t	len;
-	char	*str;
-
-	if (dir->root)
-		return (ft_strdup(dir->name));
-	if (dir->full)
-		return (dir->full);
-	len = LEN(dir->parent, 0) + LEN(name, 0) + 1;
-	str = ft_strnew(len);
-	ft_memcpy((void*)str, dir->parent, LEN(dir->parent, 0));
-	ft_strcat(str, "/");
-	ft_strcat(str, name);
-	return (str);
-}
-
-char	*form_path(t_dir *dir, char *name)
-{
-	size_t	len;
-	char	*str;
-
-	len = LEN(dir->full, 0) + LEN(name, 0) + 1;
-	str = ft_strnew(len);
-	ft_memcpy((void*)str, dir->full, LEN(dir->full, 0));
-	ft_strcat(str, "/");
-	ft_strcat(str, name);
-	return (str);
-}
-
-void	add_to_total(t_ls *ctx, char *name, t_dir *dir, int size)
-{
-	if (name[0] == '.' && GET_ALL(ctx->flags))
-		dir->total += size;
-	else if (name[0] != '.')
-		dir->total += size;
-}
-
-void	deduplicate_node(t_list *node)
-{
-	t_dir *n;
-
-	n = (t_dir*)node->content;
-	n->name = ft_strdup(n->name);
-	n->parent = ft_strdup(n->parent);
-	n->full = ft_strdup(n->full);
-	n->links = ft_strdup(n->links);
-	n->owner_name = ft_strdup(n->owner_name);
-	n->owner_group = ft_strdup(n->owner_group);
-	n->size = ft_strdup(n->size);
-	n->date = ft_strdup(n->date);
-	n->total_out = ft_strdup(n->total_out);
-	n->date_str = ft_strdup(n->date_str);
-	n->name_str = ft_strdup(n->name_str);
-	n->format_str = ft_strdup(n->format_str);
+	while ((d = readdir(dr)))
+	{
+		ft_bzero(&node, sizeof(t_dir));
+		if (ERR(lstat((node.full = form_path(dir, d->d_name)), &attribs)))
+		{
+			if (errno == EACCES)
+				dir->denied = 1;
+			continue ;
+		}
+		add_to_total(ctx, d->d_name, dir, attribs.st_blocks);
+		harvest_node(ctx, &node, &attribs);
+		if (add_dir_name(dir, d->d_name, &node) && GET_RECURSE(ctx->flags))
+		{
+			ft_lstpushback(dirs, ft_lstnew((void*)&node, sizeof(t_dir)));
+			deduplicate_node(ft_lstlast(*dirs));
+		}
+		ft_lstpushback(&dir->files, ft_lstnew((void*)&node, sizeof(t_dir)));
+	}
 }
 
 void	harvest_dir(t_ls *ctx, t_dir *dir)
 {
 	t_list			*dirs;
-	t_dir			node;
-	struct dirent	*d;
 	DIR				*dr;
-	struct stat		attribs;
 
 	dirs = NULL;
 	errno = 0;
 	if (dir->dir && (dr = opendir((dir->full = form_dir(dir, dir->name)))))
 	{
-		while ((d = readdir(dr)))
-		{
-			ft_bzero(&node, sizeof(t_dir));
-			if (ERR(lstat((node.full = form_path(dir, d->d_name)), &attribs)))
-			{
-				if (errno == EACCES)
-					dir->denied = 1;
-				continue ;
-			}
-			add_to_total(ctx, d->d_name, dir, attribs.st_blocks);
-			harvest_node(ctx, &node, &attribs);
-			if (add_dir_name(dir, d->d_name, &node) && GET_RECURSE(ctx->flags))
-			{
-				ft_lstpushback(&dirs, ft_lstnew((void*)&node, sizeof(t_dir)));
-				deduplicate_node(ft_lstlast(dirs));
-			}
-			ft_lstpushback(&dir->files, ft_lstnew((void*)&node, sizeof(t_dir)));
-		}
+		harvest_dir_nodes(ctx, dir, &dirs, dr);
 		closedir(dr);
 		dirs = ft_lstmergesort(ctx->compare
 			, dirs, !GET_REVERSE(ctx->flags), ft_lstsize(dirs));
@@ -154,10 +95,6 @@ void	harvest_dir(t_ls *ctx, t_dir *dir)
 	else if (errno == EACCES)
 		dir->denied = 1;
 }
-
-/*
-** traverse given directories  and subdirectories, printing at each stage
-*/
 
 void	crawl_files(t_ls *ctx)
 {

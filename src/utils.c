@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/07 15:16:48 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/09 23:26:50 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/11 16:31:15 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,11 +54,6 @@ void	free_dir(void *d, size_t len)
 	if (dir->files)
 		ft_lstdel(&dir->files, free_dir);
 	free(d);
-}
-
-void	remove_hidden(t_list *elem)
-{
-	free_dir(elem->content, elem->content_size);
 }
 
 int		find_files(t_list *elem)

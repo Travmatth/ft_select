@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:08:47 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/09 22:26:05 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/11 16:54:12 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,24 +95,78 @@ typedef struct	s_ls
 	int			top_lvl_dirs;
 }				t_ls;
 
-void			*get_max_width(void *final, t_list *elem, size_t i, int *stop);
-int				find_files(t_list *elem);
-int				find_hidden(t_list *elem);
-void			free_dir(void *d, size_t len);
-void			remove_hidden(t_list *elem);
-void			*find_link(void *final, t_list *elem, size_t i, int *stop);
-void			*find_name(void *final, t_list *elem, size_t i, int *stop);
-void			*find_grp(void *final, t_list *elem, size_t i, int *stop);
-void			*find_size(void *final, t_list *elem, size_t i, int *stop);
-int				*find_widths(t_list *lst, int widths[5]);
-void			crawl_files(t_ls *ctx);
-void			print_dir(t_ls *ctx, t_dir *dir);
-void			print_files(t_ls *ctx, t_list *files);
-void			harvest_node(t_ls *ctx
-							, t_dir *node
-							, struct stat *attribs);
+/*
+** widths.c
+*/
+
+int		*find_widths(t_list *lst, int widths[4]);
+
+/*
+** sort.c
+*/
+
 int				sort_access(void *first, void *second);
 int				sort_time(void *first, void *second);
 int				sort_alpha(void *first, void *second);
 int				sort_null(void *first, void *second);
+
+/*
+** crawl_utils.c
+*/
+
+int				add_dir_name(t_dir *dir, char *current, t_dir *node);
+char			*form_dir(t_dir *dir, char *name);
+char			*form_path(t_dir *dir, char *name);
+void			add_to_total(t_ls *ctx, char *name, t_dir *dir, int size);
+void			deduplicate_node(t_list *node);
+
+/*
+** crawl.c
+*/
+
+void			set_root_dir(t_ls *ctx, t_dir *dir, char *dirname, char *files);
+void			harvest_node(t_ls *ctx, t_dir *node, struct stat *attribs);
+void			harvest_dir_nodes(t_ls *ctx, t_dir *dir, t_list **dirs, DIR *dr);
+void			harvest_dir(t_ls *ctx, t_dir *dir);
+void			crawl_files(t_ls *ctx);
+
+/*
+** format.c
+*/
+
+char			*format_color(t_ls *ctx, char *template, t_dir *node);
+char			*format_permissions(t_dir *file);
+char			*format_date(char *date);
+char			*format_name(t_dir *node);
+
+/*
+** print.c
+*/
+
+void			print_multiline_files(t_ls *ctx, t_list *node, t_list *files);
+void			print_files(t_ls *ctx, t_list *files);
+void			print_single_dir(t_ls *ctx, t_dir *dir, t_list **node);
+void			print_multi_dir(t_ls *ctx, t_dir *dir, t_list **node);
+void			print_dir(t_ls *ctx, t_dir *dir);
+
+/*
+** print_utils.c
+*/
+
+void			print_long(t_ls *ctx, t_dir *n, t_list *lst);
+void			print_long_listings(t_ls *ctx, t_list *lst, char *totals);
+char			*template_swap_first(char *template, char *fmt);
+char			*template_make_last(char *template, char *fmt, t_dir *node);
+void			get_files_per_line(t_list *files
+									, unsigned short *files_per_line
+									, void **max);
+
+/*
+** utils.c
+*/
+
+int				find_hidden(t_list *elem);
+void			free_dir(void *d, size_t len);
+int				find_files(t_list *elem);
+void			*get_max_width(void *final, t_list *elem, size_t i, int *stop);
 #endif

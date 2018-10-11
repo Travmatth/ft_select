@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:06:46 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/10 23:02:58 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/11 16:38:40 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,18 +48,6 @@ void	ft_ls_usage(char opt)
 	write(STDOUT, &opt, 1);
 	write(STDOUT, "\nusage: ls [-GRadfglrtu1] [file ...]\n", 38);
 	exit(1);
-}
-
-void	set_root_dir(t_ls *ctx, t_dir *dir, char *dirname, char *files)
-{
-	*files = 1;
-	ctx->top_lvl_dirs += 1;
-	ft_bzero((void*)dir, sizeof(t_dir));
-	dir->name = ft_strdup(dirname);
-	dir->parent = ft_strdup(dirname);
-	dir->full = dirname;
-	dir->root = 1;
-	dir->dir = GET_NO_RECURSE(ctx->flags) ? 0 : 1;
 }
 
 void	locate_file(t_ls *ctx, char *dirname, char *files)
