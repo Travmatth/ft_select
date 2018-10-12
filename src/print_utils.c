@@ -6,11 +6,15 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/11 16:42:43 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/11 16:55:02 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/11 17:15:55 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ft_ls.h"
+
+/*
+** print a given node in long format
+*/
 
 void	print_long(t_ls *ctx, t_dir *n, t_list *lst)
 {
@@ -30,7 +34,11 @@ void	print_long(t_ls *ctx, t_dir *n, t_list *lst)
 	free(perms);
 }
 
-void	print_long_listings(t_ls *ctx, t_list *lst, char *totals)
+/*
+** print given directory with long formatting
+*/
+
+void	print_long_dir(t_ls *ctx, t_list *lst, char *totals)
 {
 	t_list	*node;
 	t_dir	*n;
@@ -57,6 +65,10 @@ void	print_long_listings(t_ls *ctx, t_list *lst, char *totals)
 	}
 }
 
+/*
+** add color code to short format strings
+*/
+
 char	*template_swap_first(char *template, char *fmt)
 {
 	char	*out;
@@ -77,6 +89,10 @@ char	*template_swap_first(char *template, char *fmt)
 	return (out);
 }
 
+/*
+** add color to long format strings
+*/
+
 char	*template_make_last(char *template, char *fmt, t_dir *node)
 {
 	char	*out;
@@ -92,12 +108,19 @@ char	*template_make_last(char *template, char *fmt, t_dir *node)
 	return (out);
 }
 
-void	get_files_per_line(t_list *files, unsigned short *files_per_line, void **max)
+/*
+** find maximum width of given files stack name members
+*/
+
+void	get_files_per_line(t_list *files
+							, unsigned short *files_per_line
+							, void **max)
 {
 	struct winsize	w;
 
 	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 	*max = ft_lstfoldl(get_max_width, files);
-	*files_per_line = (w.ws_col ? w.ws_col : 80) / (*max ? **(size_t**)max : 10);
+	*files_per_line = (w.ws_col ? w.ws_col : 80)
+		/ (*max ? **(size_t**)max : 10);
 	free(max);
 }

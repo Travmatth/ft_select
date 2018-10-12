@@ -6,11 +6,15 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/07 15:16:48 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/11 16:31:15 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/11 17:20:30 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ft_ls.h"
+
+/*
+** find hidden files
+*/
 
 int		find_hidden(t_list *elem)
 {
@@ -25,6 +29,10 @@ int		find_hidden(t_list *elem)
 		return (1);
 	return (0);
 }
+
+/*
+** free given directory node
+*/
 
 void	free_dir(void *d, size_t len)
 {
@@ -56,6 +64,10 @@ void	free_dir(void *d, size_t len)
 	free(d);
 }
 
+/*
+** find nodes with are plain files, not directories
+*/
+
 int		find_files(t_list *elem)
 {
 	t_dir	*dir;
@@ -63,6 +75,10 @@ int		find_files(t_list *elem)
 	dir = (t_dir*)elem->content;
 	return (!dir->dir);
 }
+
+/*
+** find maximum widths of node names
+*/
 
 void	*get_max_width(void *final, t_list *elem, size_t i, int *stop)
 {

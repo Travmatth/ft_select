@@ -6,11 +6,15 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/30 18:54:23 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/11 16:44:12 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/11 17:17:44 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ft_ls.h"
+
+/*
+** print given files in short format
+*/
 
 void	print_multiline_files(t_ls *ctx, t_list *node, t_list *files)
 {
@@ -32,6 +36,10 @@ void	print_multiline_files(t_ls *ctx, t_list *node, t_list *files)
 	write(STDOUT, "\n\n", 2);
 }
 
+/*
+** print given files in short or long format
+*/
+
 void	print_files(t_ls *ctx, t_list *files)
 {
 	t_dir			*n;
@@ -41,7 +49,7 @@ void	print_files(t_ls *ctx, t_list *files)
 		files = ft_lstfilter(files, find_hidden, free_dir);
 	if (GET_LONG(ctx->flags))
 	{
-		print_long_listings(ctx, files, NULL);
+		print_long_dir(ctx, files, NULL);
 		return ;
 	}
 	node = ft_lsttail(&files);
@@ -59,6 +67,10 @@ void	print_files(t_ls *ctx, t_list *files)
 	}
 }
 
+/*
+** print single directory in short format
+*/
+
 void	print_single_dir(t_ls *ctx, t_dir *dir, t_list **node)
 {
 	t_dir			*n;
@@ -69,6 +81,10 @@ void	print_single_dir(t_ls *ctx, t_dir *dir, t_list **node)
 	ft_lstdel(node, free_dir);
 	*node = ft_lsttail(&dir->files);
 }
+
+/*
+** print given directory in short format
+*/
 
 void	print_multi_dir(t_ls *ctx, t_dir *dir, t_list **node)
 {
@@ -92,6 +108,10 @@ void	print_multi_dir(t_ls *ctx, t_dir *dir, t_list **node)
 		write(STDOUT, "\n", 1);
 }
 
+/*
+** print given directory in short or long formats
+*/
+
 void	print_dir(t_ls *ctx, t_dir *dir)
 {
 	t_list			*node;
@@ -108,7 +128,7 @@ void	print_dir(t_ls *ctx, t_dir *dir)
 	if (GET_LONG(ctx->flags))
 	{
 		dir->total_out = ft_itoa(dir->total);
-		print_long_listings(ctx, dir->files, dir->total_out);
+		print_long_dir(ctx, dir->files, dir->total_out);
 		return ;
 	}
 	node = ft_lsttail(&dir->files);

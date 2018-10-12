@@ -6,13 +6,17 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/09 20:08:57 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/11 16:55:04 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/11 17:09:04 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ft_ls.h"
 
 static	char	*g_permissions = "----------";
+
+/*
+** format node colors
+*/
 
 char	*format_color(t_ls *ctx, char *template, t_dir *node)
 {
@@ -44,6 +48,10 @@ char	*format_color(t_ls *ctx, char *template, t_dir *node)
 	return (out);
 }
 
+/*
+** format node name for printing
+*/
+
 char	*format_permissions(t_dir *file)
 {
 	char *out;
@@ -73,6 +81,10 @@ char	*format_permissions(t_dir *file)
 	return (out);
 }
 
+/*
+** format node date for printing
+*/
+
 char	*format_date(char *date)
 {
 	char	*out;
@@ -95,6 +107,10 @@ char	*format_date(char *date)
 	free(parts);
 	return (out);
 }
+
+/*
+** format node name for printing
+*/
 
 char	*format_name(t_dir *node)
 {

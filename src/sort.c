@@ -6,14 +6,14 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/30 18:55:12 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/09 17:36:11 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/11 17:19:03 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ft_ls.h"
 
 /*
-** stat.ST_ATIME | Time of last access.
+** sort time of last access.
 */
 
 int		sort_access(void *first, void *second)
@@ -39,11 +39,7 @@ int		sort_access(void *first, void *second)
 }
 
 /*
-** stat.ST_MTIME | Time of last modification.
-*/
-
-/*
-** stat.ST_CTIME | On Unix systems is the time of the last metadata change
+** sort time of last modification
 */
 
 int		sort_time(void *first, void *second)
@@ -68,6 +64,10 @@ int		sort_time(void *first, void *second)
 	return (0);
 }
 
+/*
+** sort nodes alphabetically
+*/
+
 int		sort_alpha(void *first, void *second)
 {
 	char 	*f;
@@ -81,6 +81,10 @@ int		sort_alpha(void *first, void *second)
 		return (1);
 	return (0);
 }
+
+/*
+** except for . and .. directory entries, do not sort
+*/
 
 int		sort_null(void *first, void *second)
 {

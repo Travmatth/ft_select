@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:06:46 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/11 16:38:40 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/11 17:11:37 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,10 @@ t_lsopt	g_lsopts[] =
 	{'1', 10}
 };
 
+/*
+** print usage
+*/
+
 void	ft_ls_usage(char opt)
 {
 	write(STDOUT, "s: illegal option -- ", 22);
@@ -49,6 +53,10 @@ void	ft_ls_usage(char opt)
 	write(STDOUT, "\nusage: ls [-GRadfglrtu1] [file ...]\n", 38);
 	exit(1);
 }
+
+/*
+** harvest potential directory names into nodes, print error otherwise
+*/
 
 void	locate_file(t_ls *ctx, char *dirname, char *files)
 {
@@ -79,6 +87,10 @@ void	locate_file(t_ls *ctx, char *dirname, char *files)
 		ft_printf("ls: %s: No such file or directory\n", dirname);
 }
 
+/*
+** parse options into ctx->flags bit field
+*/
+
 void	parse_opt(t_ls *ctx, char opt)
 {
 	int		i;
@@ -101,6 +113,10 @@ void	parse_opt(t_ls *ctx, char opt)
 	if (!found)
 		ft_ls_usage(opt);
 }
+
+/*
+** parse options and locate files, set current dir if none passed
+*/
 
 void	parse_opts(t_ls *ctx, int argc, char **argv, int n)
 {
@@ -131,6 +147,10 @@ void	parse_opts(t_ls *ctx, int argc, char **argv, int n)
 	else if (!stop)
 		locate_file(ctx, ".", &stop);
 }
+
+/*
+** parse options, crawl files & print contents
+*/
 
 int		main(int argc, char **argv)
 {

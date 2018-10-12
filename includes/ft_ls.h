@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:08:47 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/11 16:54:12 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/11 17:13:58 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,7 +154,7 @@ void			print_dir(t_ls *ctx, t_dir *dir);
 */
 
 void			print_long(t_ls *ctx, t_dir *n, t_list *lst);
-void			print_long_listings(t_ls *ctx, t_list *lst, char *totals);
+void			print_long_dir(t_ls *ctx, t_list *lst, char *totals);
 char			*template_swap_first(char *template, char *fmt);
 char			*template_make_last(char *template, char *fmt, t_dir *node);
 void			get_files_per_line(t_list *files

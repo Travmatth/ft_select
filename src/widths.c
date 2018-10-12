@@ -6,11 +6,15 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/06 18:09:50 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/09 14:53:20 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/11 17:22:03 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ft_ls.h"
+
+/*
+** find linkswidth of all node members to be printed
+*/
 
 void	*find_link(void *final, t_list *elem, size_t i, int *stop)
 {
@@ -31,6 +35,10 @@ void	*find_link(void *final, t_list *elem, size_t i, int *stop)
 	return (final);
 }
 
+/*
+** find maximum ownder name width of all node members to be printed
+*/
+
 void	*find_name(void *final, t_list *elem, size_t i, int *stop)
 {
 	t_dir	*d;
@@ -49,6 +57,10 @@ void	*find_name(void *final, t_list *elem, size_t i, int *stop)
 	}
 	return (final);
 }
+
+/*
+** find maximum group name width of all node members to be printed
+*/
 
 void	*find_grp(void *final, t_list *elem, size_t i, int *stop)
 {
@@ -69,6 +81,10 @@ void	*find_grp(void *final, t_list *elem, size_t i, int *stop)
 	return (final);
 }
 
+/*
+** find maximum size width of all node members to be printed
+*/
+
 void	*find_size(void *final, t_list *elem, size_t i, int *stop)
 {
 	t_dir	*d;
@@ -87,6 +103,10 @@ void	*find_size(void *final, t_list *elem, size_t i, int *stop)
 	}
 	return (final);
 }
+
+/*
+** find maximum widths of all node members to be printed
+*/
 
 int		*find_widths(t_list *lst, int widths[4])
 {

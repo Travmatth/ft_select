@@ -6,12 +6,16 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/30 18:56:11 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/11 16:41:05 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/11 17:07:35 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 #include "../includes/ft_ls.h"
+
+/*
+** populate root dir struct with appropriate members
+*/
 
 void	set_root_dir(t_ls *ctx, t_dir *dir, char *dirname, char *files)
 {
@@ -24,6 +28,10 @@ void	set_root_dir(t_ls *ctx, t_dir *dir, char *dirname, char *files)
 	dir->root = 1;
 	dir->dir = GET_NO_RECURSE(ctx->flags) ? 0 : 1;
 }
+
+/*
+** populate given node with appropriate attribute members
+*/
 
 void	harvest_node(t_ls *ctx, t_dir *node, struct stat *attribs)
 {
@@ -46,6 +54,11 @@ void	harvest_node(t_ls *ctx, t_dir *node, struct stat *attribs)
 		node->owner_group = ft_strdup(gr->gr_name);
 	node->size = ft_itoa(attribs->st_size);
 }
+
+/*
+** iterate through given directory, harvesting contents and adding output
+** to appropriate stacks
+*/
 
 void	harvest_dir_nodes(t_ls *ctx, t_dir *dir, t_list **dirs, DIR *dr)
 {
@@ -73,6 +86,12 @@ void	harvest_dir_nodes(t_ls *ctx, t_dir *dir, t_list **dirs, DIR *dr)
 	}
 }
 
+/*
+** harvest files of the given directory, adding files to dir->files
+** and adding directories  onto both dir->files and the stack of directories
+** to be harvested
+*/
+
 void	harvest_dir(t_ls *ctx, t_dir *dir)
 {
 	t_list			*dirs;
@@ -95,6 +114,12 @@ void	harvest_dir(t_ls *ctx, t_dir *dir)
 	else if (errno == EACCES)
 		dir->denied = 1;
 }
+
+/*
+** if given a stack of files to print, do so
+** else if given a stack of directories to harvest, will sort
+** and print the contents of each directory as it is harvested
+*/
 
 void	crawl_files(t_ls *ctx)
 {

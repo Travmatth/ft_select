@@ -6,11 +6,15 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/11 16:39:11 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/11 16:41:08 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/11 17:02:20 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ft_ls.h"
+
+/*
+** adds the correct current and parent directory names to current node 
+*/
 
 int		add_dir_name(t_dir *dir, char *current, t_dir *node)
 {
@@ -26,6 +30,10 @@ int		add_dir_name(t_dir *dir, char *current, t_dir *node)
 		return (1);
 	return (0);
 }
+
+/*
+** add the correct full directory name to current node  
+*/
 
 char	*form_dir(t_dir *dir, char *name)
 {
@@ -44,6 +52,10 @@ char	*form_dir(t_dir *dir, char *name)
 	return (str);
 }
 
+/*
+** correctly format directory path name
+*/
+
 char	*form_path(t_dir *dir, char *name)
 {
 	size_t	len;
@@ -57,6 +69,10 @@ char	*form_path(t_dir *dir, char *name)
 	return (str);
 }
 
+/*
+** add current files size to parent dir total, if appropriate
+*/
+
 void	add_to_total(t_ls *ctx, char *name, t_dir *dir, int size)
 {
 	if (name[0] == '.' && GET_ALL(ctx->flags))
@@ -64,6 +80,11 @@ void	add_to_total(t_ls *ctx, char *name, t_dir *dir, int size)
 	else if (name[0] != '.')
 		dir->total += size;
 }
+
+/*
+** ensure node being pushed onto directory doesnt contain same
+** pointers as the node being pushed onto node->files
+*/
 
 void	deduplicate_node(t_list *node)
 {
