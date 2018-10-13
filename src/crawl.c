@@ -6,10 +6,9 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/30 18:56:11 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/11 17:07:35 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/12 18:16:51 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 
 #include "../includes/ft_ls.h"
 
@@ -38,7 +37,7 @@ void	harvest_node(t_ls *ctx, t_dir *node, struct stat *attribs)
 	struct passwd	*pw;
 	struct group	*gr;
 
-	node->dir = S_ISDIR(attribs->st_mode) && !GET_NO_RECURSE(ctx->flags) ? 1 : 0;
+	set_dir_status(ctx, node, attribs);
 	node->mtime = attribs->st_mtimespec.tv_sec;
 	node->mtime_nsec = attribs->st_mtimespec.tv_nsec;
 	node->atime = attribs->st_atimespec.tv_sec;
@@ -46,7 +45,7 @@ void	harvest_node(t_ls *ctx, t_dir *node, struct stat *attribs)
 	node->mode = attribs->st_mode;
 	if (!GET_LONG(ctx->flags))
 		return ;
-	node->date = ctime(&attribs->st_mtimespec.tv_sec);
+	node->date = ft_strdup(ctime(&attribs->st_mtimespec.tv_sec));
 	node->links = ft_itoa(attribs->st_nlink);
 	if ((pw = getpwuid(attribs->st_uid)))
 		node->owner_name = ft_strdup(pw->pw_name);
@@ -99,7 +98,8 @@ void	harvest_dir(t_ls *ctx, t_dir *dir)
 
 	dirs = NULL;
 	errno = 0;
-	if (dir->dir && (dr = opendir((dir->full = form_dir(dir, dir->name)))))
+	if (dir->dir && (dr = opendir(
+		(dir->full = form_dir(dir, dir->name)))))
 	{
 		harvest_dir_nodes(ctx, dir, &dirs, dr);
 		closedir(dr);
@@ -132,7 +132,8 @@ void	crawl_files(t_ls *ctx)
 	ctx->compare = sort_alpha;
 	GET_NO_SORT(ctx->flags) ? (ctx->compare = sort_null) : NULL;
 	GET_SORT_TIME(ctx->flags) ? (ctx->compare = sort_time) : NULL;
-	GET_SORT_ACCESS(ctx->flags) && GET_SORT_TIME(ctx->flags) ? (ctx->compare = sort_access) : NULL;
+	GET_SORT_ACCESS(ctx->flags) && GET_SORT_TIME(ctx->flags)
+		? (ctx->compare = sort_access) : NULL;
 	files = ft_lstseparate(&ctx->stack, find_files);
 	len = ft_lstsize(files);
 	files = ft_lstmergesort(ctx->compare, files, rev, len);

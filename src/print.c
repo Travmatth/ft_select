@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/30 18:54:23 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/11 17:17:44 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/12 18:09:07 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,8 +42,8 @@ void	print_multiline_files(t_ls *ctx, t_list *node, t_list *files)
 
 void	print_files(t_ls *ctx, t_list *files)
 {
-	t_dir			*n;
-	t_list			*node;
+	t_dir	*n;
+	t_list	*node;
 
 	if (!GET_ALL(ctx->flags))
 		files = ft_lstfilter(files, find_hidden, free_dir);
@@ -114,7 +114,8 @@ void	print_multi_dir(t_ls *ctx, t_dir *dir, t_list **node)
 
 void	print_dir(t_ls *ctx, t_dir *dir)
 {
-	t_list			*node;
+	t_list	*node;
+	int		widths[4];
 
 	if (!dir->root || (dir->root && ctx->top_lvl_dirs > 1))
 		ft_printf("\n%s:\n", dir->full);
@@ -128,7 +129,9 @@ void	print_dir(t_ls *ctx, t_dir *dir)
 	if (GET_LONG(ctx->flags))
 	{
 		dir->total_out = ft_itoa(dir->total);
+		find_widths(dir->files, widths);
 		print_long_dir(ctx, dir->files, dir->total_out);
+		dir->files = NULL;
 		return ;
 	}
 	node = ft_lsttail(&dir->files);

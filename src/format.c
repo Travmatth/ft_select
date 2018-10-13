@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/09 20:08:57 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/11 17:09:04 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/12 18:14:59 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,17 +15,38 @@
 static	char	*g_permissions = "----------";
 
 /*
+** find maximum widths of node names
+*/
+
+void	*get_max_width(void *final, t_list *elem, size_t i, int *stop)
+{
+	t_dir	*dir;
+	size_t	size;
+
+	(void)i;
+	(void)stop;
+	dir = (t_dir*)elem->content;
+	size = LEN(dir->name, 0);
+	if (!final)
+		return (ft_memdup(&size, sizeof(size_t)));
+	else if (*(size_t*)final < size)
+	{
+		free(final);
+		return (ft_memdup(&size, sizeof(size_t)));
+	}
+	return (final);
+}
+
+/*
 ** format node colors
 */
 
 char	*format_color(t_ls *ctx, char *template, t_dir *node)
 {
 	char	*fmt;
-	char	*out;
 
-	if (!GET_COLOR_OUT(ctx->flags))
-		return (template);
-	else if (S_ISLNK(node->mode))
+	fmt = NULL;
+	if (S_ISLNK(node->mode))
 		fmt = "{purple}";
 	else if (S_ISDIR(node->mode))
 		fmt = "{b_blue}";
@@ -39,13 +60,14 @@ char	*format_color(t_ls *ctx, char *template, t_dir *node)
 		fmt = "{b_cyan}";
 	else if (node->mode & S_IXUSR)
 		fmt = "{red}";
-	else if (S_ISREG(node->mode))
+	if ((!fmt || !GET_COLOR_OUT(ctx->flags))
+		&& ft_count_char(template, '%') <= 2)
 		return (ft_strdup(template));
-	if (ft_count_char(template, '%') <= 2)
-		out = template_swap_first(template, fmt);
-	else
-		out = template_make_last(template, fmt, node);
-	return (out);
+	else if (!fmt || !GET_COLOR_OUT(ctx->flags))
+		return (ft_strjoin(template, S_ISLNK(node->mode) ? "%s -> %s" : "%s"));
+	return (ft_count_char(template, '%') <= 2
+			? template_swap_first(template, fmt)
+			: template_make_last(template, fmt, node));
 }
 
 /*

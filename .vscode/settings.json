@@ -5,7 +5,8 @@
 		"conversions.h": "c",
 		"libft.h": "c",
 		"ft_ssl.h": "c",
-		"pbkdf2.h": "c"
+		"pbkdf2.h": "c",
+		"ft_ls.h": "c"
 	},
     "vim.visualModeKeyBindings": [
         {

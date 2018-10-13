@@ -6,14 +6,14 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/11 16:39:11 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/11 17:02:20 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/12 18:18:06 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ft_ls.h"
 
 /*
-** adds the correct current and parent directory names to current node 
+** adds the correct current and parent directory names to current node
 */
 
 int		add_dir_name(t_dir *dir, char *current, t_dir *node)
@@ -32,7 +32,7 @@ int		add_dir_name(t_dir *dir, char *current, t_dir *node)
 }
 
 /*
-** add the correct full directory name to current node  
+** add the correct full directory name to current node
 */
 
 char	*form_dir(t_dir *dir, char *name)

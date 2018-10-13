@@ -6,11 +6,35 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/07 15:16:48 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/11 17:20:30 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/12 18:14:52 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ft_ls.h"
+
+/*
+** find whether given symbolic links underlying file is a directory
+*/
+
+void	set_dir_status(t_ls *ctx, t_dir *node, struct stat *attribs)
+{
+	char		buf[256];
+	ssize_t		bytes;
+	struct stat	orig_attribs;
+
+	if (S_ISLNK(attribs->st_mode))
+	{
+		ft_bzero(buf, 256);
+		bytes = readlink(node->full, buf, 255);
+		lstat(buf, &orig_attribs);
+		node->dir = S_ISDIR(orig_attribs.st_mode) ? 1 : 0;
+		node->dir = GET_LONG(ctx->flags) ? 0 : node->dir;
+		node->dir = GET_NO_RECURSE(ctx->flags) ? 0 : node->dir;
+		return ;
+	}
+	node->dir = S_ISDIR(attribs->st_mode) ? 1 : 0;
+	node->dir = GET_NO_RECURSE(ctx->flags) ? 0 : node->dir;
+}
 
 /*
 ** find hidden files
@@ -34,15 +58,10 @@ int		find_hidden(t_list *elem)
 ** free given directory node
 */
 
-void	free_dir(void *d, size_t len)
+void	conditional_free(t_dir *dir)
 {
-	t_dir	*dir;
-
-	(void)len;
-	dir = (t_dir*)d;
-	free(dir->name);
-	free(dir->parent);
-	free(dir->full);
+	if (!dir->root)
+		free(dir->full);
 	if (dir->links)
 		free(dir->links);
 	if (dir->owner_name)
@@ -61,6 +80,21 @@ void	free_dir(void *d, size_t len)
 		free(dir->format_str);
 	if (dir->files)
 		ft_lstdel(&dir->files, free_dir);
+}
+
+/*
+** free given directory node
+*/
+
+void	free_dir(void *d, size_t len)
+{
+	t_dir	*dir;
+
+	(void)len;
+	dir = (t_dir*)d;
+	free(dir->name);
+	free(dir->parent);
+	conditional_free(dir);
 	free(d);
 }
 
@@ -74,27 +108,4 @@ int		find_files(t_list *elem)
 
 	dir = (t_dir*)elem->content;
 	return (!dir->dir);
-}
-
-/*
-** find maximum widths of node names
-*/
-
-void	*get_max_width(void *final, t_list *elem, size_t i, int *stop)
-{
-	(void)i;
-	(void)stop;
-	t_dir	*dir;
-	size_t	size;
-
-	dir = (t_dir*)elem->content;
-	size = LEN(dir->name, 0);
-	if (!final)
-		return (ft_memdup(&size, sizeof(size_t)));
-	else if (*(size_t*)final < size)
-	{
-		free(final);
-		return (ft_memdup(&size, sizeof(size_t)));
-	}
-	return (final);
 }

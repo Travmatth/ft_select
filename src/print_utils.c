@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/11 16:42:43 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/11 17:15:55 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/12 18:09:37 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,12 +16,10 @@
 ** print a given node in long format
 */
 
-void	print_long(t_ls *ctx, t_dir *n, t_list *lst)
+void	print_long(t_ls *ctx, t_dir *n, int widths[4])
 {
 	char	*perms;
-	int		widths[4];
 
-	find_widths(lst, widths);
 	perms = format_permissions(n);
 	n->date_str = format_date(n->date);
 	n->name_str = format_name(n);
@@ -42,7 +40,9 @@ void	print_long_dir(t_ls *ctx, t_list *lst, char *totals)
 {
 	t_list	*node;
 	t_dir	*n;
+	int		widths[4];
 
+	find_widths(lst, widths);
 	node = ft_lsttail(&lst);
 	if (totals && node)
 		ft_printf("total %s\n", totals);
@@ -55,7 +55,7 @@ void	print_long_dir(t_ls *ctx, t_list *lst, char *totals)
 			if (n->denied)
 				ft_printf("ls: %s: Permission denied", n->name);
 			else
-				print_long(ctx, n, lst);
+				print_long(ctx, n, widths);
 			write(STDOUT, "\n", 1);
 			ft_lstdel(&node, free_dir);
 			node = ft_lsttail(&lst);
@@ -122,5 +122,5 @@ void	get_files_per_line(t_list *files
 	*max = ft_lstfoldl(get_max_width, files);
 	*files_per_line = (w.ws_col ? w.ws_col : 80)
 		/ (*max ? **(size_t**)max : 10);
-	free(max);
+	free(*max);
 }

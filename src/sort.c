@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/30 18:55:12 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/11 17:19:03 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/12 18:17:51 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,12 +70,16 @@ int		sort_time(void *first, void *second)
 
 int		sort_alpha(void *first, void *second)
 {
-	char 	*f;
-	char 	*s;
+	char	*f;
+	char	*s;
 	int		sort;
 
-	f = ((t_dir*)first)->full ? ((t_dir*)first)->full : ((t_dir*)first)->name;
-	s = ((t_dir*)second)->full ? ((t_dir*)second)->full : ((t_dir*)second)->name;
+	f = ((t_dir*)first)->full
+		? ((t_dir*)first)->full
+		: ((t_dir*)first)->name;
+	s = ((t_dir*)second)->full
+		? ((t_dir*)second)->full
+		: ((t_dir*)second)->name;
 	sort = ft_strcmp(f, s);
 	if (sort <= 0)
 		return (1);
@@ -88,8 +92,8 @@ int		sort_alpha(void *first, void *second)
 
 int		sort_null(void *first, void *second)
 {
-	char 	*f;
-	char 	*s;
+	char	*f;
+	char	*s;
 
 	f = ((t_dir*)first)->name;
 	s = ((t_dir*)second)->name;

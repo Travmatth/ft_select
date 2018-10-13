@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:06:46 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/11 17:11:37 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/12 18:15:59 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ t_lsopt	g_lsopts[] =
 
 void	ft_ls_usage(char opt)
 {
-	write(STDOUT, "s: illegal option -- ", 22);
+	write(STDOUT, "ls: illegal option -- ", 23);
 	write(STDOUT, &opt, 1);
 	write(STDOUT, "\nusage: ls [-GRadfglrtu1] [file ...]\n", 38);
 	exit(1);
@@ -60,8 +60,8 @@ void	ft_ls_usage(char opt)
 
 void	locate_file(t_ls *ctx, char *dirname, char *files)
 {
-	DIR			*dir;
-	t_dir		d;
+	DIR				*dir;
+	t_dir			d;
 	struct stat		attribs;
 
 	errno = 0;
@@ -124,7 +124,6 @@ void	parse_opts(t_ls *ctx, int argc, char **argv, int n)
 	size_t	len;
 	char	stop;
 
-	stop = 0;
 	while (n < argc)
 	{
 		i = 1;
@@ -156,7 +155,7 @@ int		main(int argc, char **argv)
 {
 	t_ls	ctx;
 	int		n;
-	
+
 	ft_bzero(&ctx, sizeof(t_ls));
 	parse_opts(&ctx, argc, argv, (n = 1));
 	crawl_files(&ctx);
