@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/30 18:55:12 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/12 18:17:51 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/17 21:28:07 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,4 +102,37 @@ int		sort_null(void *first, void *second)
 	else if (ft_strequ("..", s) && !ft_strequ(".", f))
 		return (0);
 	return (1);
+}
+
+/*
+** given a linked list of sorted nodes, swap orientation
+** of nodes so that columns are sorted instead of rows
+*/
+
+t_list	*sort_line(t_list **nodes, unsigned short cols)
+{
+	t_list	**sorted;
+	int		rows;
+	int		size;
+	int		i;
+
+	size = (int)ft_lstsize(*nodes);
+	rows = (size ? (int)size : 1) / (int)cols;
+	rows = rows * cols < size ? rows + 1 : rows;
+	if (!rows || rows == 1)
+		return (*nodes);
+	sorted = (t_list**)ft_memalloc(sizeof(t_list*) * rows);
+	i = 0;
+	while (i < size)
+		ft_lstpushfront(&sorted[i++ % rows], ft_lsttail(nodes));
+	i = rows;
+	*nodes = NULL;
+	while (--i >= 0)
+	{
+		if (ft_lstsize(sorted[i]) < cols)
+			ft_lstpushfront(&sorted[i], ft_lstnew(NULL, 0));
+		ft_lstpushback(nodes, sorted[i]);
+	}
+	free(sorted);
+	return (*nodes);
 }

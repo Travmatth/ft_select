@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/11 16:42:43 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/12 18:09:37 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/17 20:47:59 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,13 +114,14 @@ char	*template_make_last(char *template, char *fmt, t_dir *node)
 
 void	get_files_per_line(t_list *files
 							, unsigned short *files_per_line
-							, void **max)
+							, size_t *max)
 {
 	struct winsize	w;
+	void			*size;
 
 	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-	*max = ft_lstfoldl(get_max_width, files);
-	*files_per_line = (w.ws_col ? w.ws_col : 80)
-		/ (*max ? **(size_t**)max : 10);
-	free(*max);
+	size = ft_lstfoldl(get_max_width, files);
+	*max = size ? *(size_t*)size : 10;
+	*files_per_line = (w.ws_col ? w.ws_col : 80) / (*max + 1);
+	free(size);
 }

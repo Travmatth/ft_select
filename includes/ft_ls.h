@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:08:47 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/12 18:20:05 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/17 19:57:22 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,6 +108,7 @@ int				sort_access(void *first, void *second);
 int				sort_time(void *first, void *second);
 int				sort_alpha(void *first, void *second);
 int				sort_null(void *first, void *second);
+t_list			*sort_line(t_list **nodes, unsigned short rows);
 
 /*
 ** crawl_utils.c
@@ -145,11 +146,11 @@ char			*format_name(t_dir *node);
 ** print.c
 */
 
-void			print_multiline_files(t_ls *ctx, t_list *node, t_list *files);
-void			print_files(t_ls *ctx, t_list *files);
-void			print_single_dir(t_ls *ctx, t_dir *dir, t_list **node);
-void			print_multi_dir(t_ls *ctx, t_dir *dir, t_list **node);
-void			print_dir(t_ls *ctx, t_dir *dir);
+void			print_multi_files(t_ls *ctx, t_list *files);
+void			print_files(t_ls *ctx, t_list *files, int *i);
+void			print_single_dir(t_ls *ctx, t_dir *dir);
+void			print_multi_dir(t_ls *ctx, t_dir *dir);
+void			print_dir(t_ls *ctx, t_dir *dir, int *i);
 
 /*
 ** print_utils.c
@@ -161,7 +162,7 @@ char			*template_swap_first(char *template, char *fmt);
 char			*template_make_last(char *template, char *fmt, t_dir *node);
 void			get_files_per_line(t_list *files
 									, unsigned short *files_per_line
-									, void **max);
+									, size_t *max);
 
 /*
 ** utils.c

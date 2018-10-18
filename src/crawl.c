@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/30 18:56:11 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/12 18:16:51 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/17 21:51:16 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,8 @@ void	set_root_dir(t_ls *ctx, t_dir *dir, char *dirname, char *files)
 	dir->full = dirname;
 	dir->root = 1;
 	dir->dir = GET_NO_RECURSE(ctx->flags) ? 0 : 1;
+	if (GET_NO_RECURSE(ctx->flags))
+		dir->full = ft_strdup(dir->full);
 }
 
 /*
@@ -108,7 +110,10 @@ void	harvest_dir(t_ls *ctx, t_dir *dir)
 		dir->files = ft_lstmergesort(ctx->compare
 			, dir->files, !GET_REVERSE(ctx->flags), ft_lstsize(dir->files));
 		if (!GET_ALL(ctx->flags))
+		{
 			dirs = ft_lstfilter(dirs, find_hidden, free_dir);
+			dir->files = ft_lstfilter(dir->files, find_hidden, free_dir);
+		}
 		ft_lstmerge(&ctx->stack, dirs);
 	}
 	else if (errno == EACCES)
@@ -127,6 +132,7 @@ void	crawl_files(t_ls *ctx)
 	t_list	*d;
 	t_list	*files;
 	size_t	len;
+	int		i;
 
 	rev = !GET_REVERSE(ctx->flags);
 	ctx->compare = sort_alpha;
@@ -134,18 +140,16 @@ void	crawl_files(t_ls *ctx)
 	GET_SORT_TIME(ctx->flags) ? (ctx->compare = sort_time) : NULL;
 	GET_SORT_ACCESS(ctx->flags) && GET_SORT_TIME(ctx->flags)
 		? (ctx->compare = sort_access) : NULL;
-	files = ft_lstseparate(&ctx->stack, find_files);
-	len = ft_lstsize(files);
-	files = ft_lstmergesort(ctx->compare, files, rev, len);
 	len = ft_lstsize(ctx->stack);
 	ctx->stack = ft_lstmergesort(ctx->compare, ctx->stack, rev, len);
-	if (files)
-		print_files(ctx, files);
+	i = 0;
+	if ((files = ft_lstseparate(&ctx->stack, find_files)))
+		print_files(ctx, files, &i);
 	while (ctx->stack)
 	{
 		d = ft_lsttail(&ctx->stack);
 		harvest_dir(ctx, (t_dir*)d->content);
-		print_dir(ctx, (t_dir*)d->content);
+		print_dir(ctx, (t_dir*)d->content, &i);
 		ft_lstdel(&d, free_dir);
 	}
 }

@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/30 18:54:23 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/12 18:09:07 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/17 22:11:08 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,35 +16,41 @@
 ** print given files in short format
 */
 
-void	print_multiline_files(t_ls *ctx, t_list *node, t_list *files)
+void	print_multi_files(t_ls *ctx, t_list *files)
 {
 	unsigned short	files_per_line;
 	unsigned short	i;
 	t_dir			*n;
-	void			*max;
+	size_t			max;
+	t_list			*node;
 
-	i = 0;
 	get_files_per_line(files, &files_per_line, &max);
-	while (node && i++ < files_per_line)
+	files = sort_line(&files, files_per_line);
+	while (ft_lstpeektail(files))
 	{
-		n = (t_dir*)node->content;
-		n->format_str = format_color(ctx, "%-*s ", n);
-		ft_printf(n->format_str, (int)max, n->name);
-		ft_lstdel(&node, free_dir);
-		node = ft_lsttail(&files);
+		i = 0;
+		while (i++ < files_per_line && (node = ft_lsttail(&files)))
+		{
+			n = (t_dir*)node->content;
+			n->format_str = format_color(ctx, "%-*s ", n);
+			ft_printf(n->format_str, (int)max, n->name);
+			ft_lstdel(&node, free_dir);
+		}
+		write(STDOUT, "\n", 1);
 	}
-	write(STDOUT, "\n\n", 2);
+	write(STDOUT, "\n", 1);
 }
 
 /*
 ** print given files in short or long format
 */
 
-void	print_files(t_ls *ctx, t_list *files)
+void	print_files(t_ls *ctx, t_list *files, int *i)
 {
 	t_dir	*n;
 	t_list	*node;
 
+	*i = 1;
 	if (!GET_ALL(ctx->flags))
 		files = ft_lstfilter(files, find_hidden, free_dir);
 	if (GET_LONG(ctx->flags))
@@ -52,80 +58,90 @@ void	print_files(t_ls *ctx, t_list *files)
 		print_long_dir(ctx, files, NULL);
 		return ;
 	}
-	node = ft_lsttail(&files);
-	while (node)
-	{
-		n = (t_dir*)node->content;
-		if (GET_NL(ctx->flags))
+	if (!GET_NL(ctx->flags))
+		print_multi_files(ctx, files);
+	else
+		while ((node = ft_lsttail(&files)))
 		{
+			n = (t_dir*)node->content;
 			ft_printf((n->format_str = format_color(ctx, "%s\n", n)), n->name);
 			ft_lstdel(&node, free_dir);
-			node = ft_lsttail(&files);
 		}
-		else
-			print_multiline_files(ctx, node, files);
-	}
 }
 
 /*
 ** print single directory in short format
 */
 
-void	print_single_dir(t_ls *ctx, t_dir *dir, t_list **node)
+void	print_single_dir(t_ls *ctx, t_dir *dir)
 {
-	t_dir			*n;
+	t_dir	*n;
+	t_list	*node;
 
-	n = (t_dir*)(*node)->content;
-	n->format_str = format_color(ctx, "%s\n", n);
-	ft_printf(n->format_str, n->name);
-	ft_lstdel(node, free_dir);
-	*node = ft_lsttail(&dir->files);
+	node = ft_lsttail(&dir->files);
+	while (node)
+	{
+		n = (t_dir*)node->content;
+		n->format_str = format_color(ctx, "%s\n", n);
+		ft_printf(n->format_str, n->name);
+		ft_lstdel(&node, free_dir);
+		node = ft_lsttail(&dir->files);
+	}
 }
 
 /*
 ** print given directory in short format
 */
 
-void	print_multi_dir(t_ls *ctx, t_dir *dir, t_list **node)
+void	print_multi_dir(t_ls *ctx, t_dir *dir)
 {
 	unsigned short	files_per_line;
 	unsigned short	i;
-	void			*max;
+	size_t			max;
 	t_dir			*n;
+	t_list			*node;
 
-	i = 0;
 	get_files_per_line(dir->files, &files_per_line, &max);
-	while (*node && i++ < files_per_line)
+	dir->files = sort_line(&dir->files, files_per_line);
+	while (ft_lstpeektail(dir->files))
 	{
-		n = (t_dir*)(*node)->content;
-		n->format_str = format_color(ctx, "%-*s ", n);
-		ft_printf(n->format_str, (int)dir->name_width, n->name);
-		ft_lstdel(node, free_dir);
-		*node = ft_lsttail(&dir->files);
-	}
-	write(STDOUT, "\n", 1);
-	if (*node)
+		i = 0;
+		while (i++ < files_per_line && (node = ft_lsttail(&dir->files)))
+		{
+			n = (t_dir*)node->content;
+			if (n)
+			{
+				n->format_str = format_color(ctx, "%-*s ", n);
+				ft_printf(n->format_str, (int)max, n->name);
+			}
+			else
+				write(STDOUT, " ", 1);
+			ft_lstdel(&node, free_dir);
+		}
 		write(STDOUT, "\n", 1);
+	}
 }
 
 /*
 ** print given directory in short or long formats
 */
 
-void	print_dir(t_ls *ctx, t_dir *dir)
+void	print_dir(t_ls *ctx, t_dir *dir, int *i)
 {
-	t_list	*node;
 	int		widths[4];
 
 	if (!dir->root || (dir->root && ctx->top_lvl_dirs > 1))
-		ft_printf("\n%s:\n", dir->full);
+	{
+		if (*i)
+			write(STDOUT, "\n", 1);
+		ft_printf("%s:\n", dir->full);
+	}
+	*i += 1;
 	if (dir->denied)
 	{
 		ft_printf("ls: %s: Permission denied\n", dir->name);
 		return ;
 	}
-	if (!GET_ALL(ctx->flags))
-		dir->files = ft_lstfilter(dir->files, find_hidden, free_dir);
 	if (GET_LONG(ctx->flags))
 	{
 		dir->total_out = ft_itoa(dir->total);
@@ -134,9 +150,5 @@ void	print_dir(t_ls *ctx, t_dir *dir)
 		dir->files = NULL;
 		return ;
 	}
-	node = ft_lsttail(&dir->files);
-	while (node)
-		GET_NL(ctx->flags)
-			? print_single_dir(ctx, dir, &node)
-			: print_multi_dir(ctx, dir, &node);
+	GET_NL(ctx->flags) ? print_single_dir(ctx, dir) : print_multi_dir(ctx, dir);
 }

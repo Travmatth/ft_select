@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/07 15:16:48 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/12 18:14:52 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/17 22:00:32 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,11 +45,11 @@ int		find_hidden(t_list *elem)
 	t_dir	*d;
 
 	d = (t_dir*)elem->content;
-	if (d->name[0] == '.' && !d->name[1])
+	if (d->name[0] == '.' && !d->name[1] && !d->root)
 		return (1);
-	if (d->name[0] == '.' && d->name[1] == '.')
+	if (d->name[0] == '.' && d->name[1] && d->name[1] == '.')
 		return (1);
-	if (d->name[0] == '.' && d->name[1] != '/')
+	if (d->name[0] == '.' && d->name[1] && d->name[1] != '/')
 		return (1);
 	return (0);
 }
@@ -60,8 +60,7 @@ int		find_hidden(t_list *elem)
 
 void	conditional_free(t_dir *dir)
 {
-	if (!dir->root)
-		free(dir->full);
+	free(dir->full);
 	if (dir->links)
 		free(dir->links);
 	if (dir->owner_name)
@@ -91,6 +90,8 @@ void	free_dir(void *d, size_t len)
 	t_dir	*dir;
 
 	(void)len;
+	if (!d)
+		return ;
 	dir = (t_dir*)d;
 	free(dir->name);
 	free(dir->parent);
