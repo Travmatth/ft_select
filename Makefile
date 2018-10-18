@@ -8,11 +8,11 @@ ifdef LEAKS
         DEBUG = -g
 endif
 
-NAME = ft_ls
+NAME = minishell
 LIBFT = libftprintf/libftprintf.a
 CFLAGS += -Wall -Wextra -Werror -Wpedantic
 LDFLAGS := -Llibftprintf -lftprintf -I./includes
-CORE := main crawl crawl_utils print print_utils sort widths utils format
+CORE := main builtins
 FILES := $(addprefix src/, $(CORE))
 SRC := $(addsuffix .c, $(FILES))
 OBJ := $(SRC:.c=.o)
@@ -32,19 +32,19 @@ $(OBJ): %.o: %.c
 	@$(CC) -c $(DEBUG) -I. $(CFLAGS) $< -o $@
 
 $(NAME): $(LIBFT) $(OBJ)
-	@echo -n 'Compiling ft_ls... '
+	@echo -n 'Compiling minishell... '
 	@$(CC) $(DEBUG) $(CFLAGS) $(LDFLAGS) $(OBJ) -o $@
 	@echo "\033[32mdone\033[0m"
 
 clean:
 	@$(MAKE) clean -C libftprintf
-	@echo -n 'Cleaning ft_ls object files... '
+	@echo -n 'Cleaning minishell object files... '
 	@rm -f $(OBJ) *.dSYM *.DS_Store
 	@echo "\033[32mdone\033[0m"
 
 fclean: clean
 	@$(MAKE) fclean -C libftprintf
-	@echo -n 'Cleaning ft_ls executable... '
+	@echo -n 'Cleaning minishell executable... '
 	@rm -f $(NAME)
 	@echo "\033[32mdone\033[0m"
 
