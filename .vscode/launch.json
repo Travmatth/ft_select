@@ -9,7 +9,7 @@
         "type": "cppdbg",
         "request": "launch",
         "program": "${workspaceRoot}/minishell",
-		"args": [],
+		"args": ["PATH=/nfs/2018/t/tmatthew/.brew/bin:/nfs/2018/t/tmatthew/nvim-osx64/bin/:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:/Library/Frameworks/Mono.framework/Versions/Current/Commands:/usr/local/munki:/nfs/2018/t/tmatthew/.brew/bin:/nfs/2018/t/tmatthew/nvim-osx64/bin/:/nfs/2018/t/tmatthew/gdb/bin:/nfs/2018/t/tmatthew/bin:/nfs/2018/t/tmatthew/gdb/bin:/nfs/2018/t/tmatthew/bin", "HOME=/nfs/2018/t/tmatthew"],
         "stopAtEntry": false,
         "cwd": "${workspaceRoot}",
         "preLaunchTask": "build",

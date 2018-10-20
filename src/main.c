@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:06:46 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/18 16:01:03 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/19 22:58:01 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,61 +14,71 @@
 
 t_builtin	g_builtins[] =
 {
-	{"echo", builtin_echo},
-	{"cd", builtin_cd},
-	{"setenv", builtin_setenv},
-	{"unsetenv", builtin_unsetenv},
-	{"env", builtin_env},
+	{"echo", builtin_echo, 4},
+	{"cd", builtin_cd, 2},
+	{"setenv", builtin_setenv, 6},
+	{"unsetenv", builtin_unsetenv, 8},
+	{"env", builtin_env, 3},
 };
 
 int		builtin_command(char *command)
 {
-	int		found;
 	int		i;
-	int		arg_c;
-	char	**arg_v;
+	int		j;
 
 	i = 0;
-	found = 0;
 	while (i < 5)
 	{
-		if (ft_strequ(g_builtins[i].cmd, command))
+		if (ft_strnequ(g_builtins[i].cmd, command, g_builtins[i].len))
 		{
-			i = 0;
-			arg_c = 0;
-			arg_v = ft_strsplit(command, ' ');
-			while (arg_v[i++])
-				arg_c += 1;
-			arg_c += 1;
-			return g_builtins[i].f(arg_c, arg_v);
+			j = 0;
+			return (g_builtins[i].f(command));
 		}
 		i += 1;
 	}
-	return (found);
+	return (0);
+}
+
+void	init_environ(int argc, char **argv)
+{
+	int		i;
+
+	g_environ = (char**)ft_memalloc(sizeof(char*) * (argc + 1));
+	i = 0;
+	while (++i < argc)
+		g_environ[i - 1] = ft_strdup(argv[i]);
+}
+
+int		unbalanced_parentheses(char *command)
+{
+	if (ft_count_char(command, '"') % 2)
+		return (1);
+	else if (ft_count_char(command, '\'') % 2)
+		return (1);
+	return (0);
 }
 
 int		main(int argc, char **argv)
 {
-	pid_t	child;
 	char	*command;
 
-	(void)argc;
-	(void)argv;
+	init_environ(argc, argv);
+	signal(SIGINT, sig_handler);
+	signal(SIGCHLD, child_sig_handler);
 	while (1)
 	{
+		ft_printf("processes: %d, pid: %d ", g_processes, getpid());
+		write(STDOUT, "$> ", 3);
 		get_next_line(STDIN, &command);
-		if (ft_strequ("exit", command))
-			break ;
-		else if (builtin_command(command))
-			continue ;
-		else if (!(child = fork()))
+		if (command)
 		{
-			ft_printf("child: %s", command);
+			expand_command(&command);
+			if (ft_strequ("exit", command))
+				break ;
+			execute_commands(command);
 		}
 		else
-		{
-			ft_printf("parent: %s", command);
-		}
+			break ;
 	}
 	return (0);
 }
