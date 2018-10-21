@@ -12,7 +12,7 @@ NAME = minishell
 LIBFT = libftprintf/libftprintf.a
 CFLAGS += -Wall -Wextra -Werror -Wpedantic
 LDFLAGS := -Llibftprintf -lftprintf -I./includes
-CORE := main command signal env
+CORE := main command signal env parse
 BUILTINS := cd echo env setenv unsetenv 
 FILES := $(addprefix src/, $(CORE)) \
 		$(addprefix src/builtins/, $(BUILTINS))

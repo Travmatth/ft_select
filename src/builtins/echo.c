@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/19 21:10:05 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/19 21:37:30 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/20 19:29:00 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 int		builtin_echo(char *command)
 {
-	char 	**args;
+	char	**args;
 	int		i;
 	int		skip;
 
