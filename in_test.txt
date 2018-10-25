@@ -1,1 +1,1 @@
-echo "this should \"work" 'this also' "that"; exit
+ echo TOP ; ls ; echo MIDDLE ; ls ; echo BOTTOM

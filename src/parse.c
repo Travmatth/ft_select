@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/20 19:23:40 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/24 22:17:11 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/25 12:56:40 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,8 @@ int		prepare_command(char **commands, char ***command, int i)
 	ac = count_params(commands[i]);
 	if (ERR(ac))
 		return (-1);
+	if (!ac)
+		return (0);
 	*command = remove_quotations(commands[i], ac);
 	return (ac);
 }

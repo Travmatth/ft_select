@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/19 19:33:17 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/20 15:21:26 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/25 13:18:00 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,17 +22,10 @@ void	child_sig_handler(int sig)
 
 void	sig_handler(int sig)
 {
-	int		i;
+	// int		i;
 
 	if (sig != SIGINT)
 		return ;
 	if (g_processes <= 0)
-	{
-		i = 0;
-		while (g_environ[i])
-			free(g_environ[i++]);
-		write(STDOUT, "\nexiting\n", 9);
-		exit(1);
-	}
-	write(STDOUT, "\n", 1);
+		write(STDOUT, "\n$>", 3);
 }

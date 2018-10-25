@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/24 21:44:04 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/24 22:29:01 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/25 13:07:56 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void	set_outside_word(char **str, char *next, int *inside_word, int *current)
 {
-	if (**str == ' ')
+	if (**str == ' ' || **str == '\t')
 		*next = 0;
 	else if (**str == '\'')
 	{
@@ -77,7 +77,7 @@ char	*next_param(char **command)
 	char	next;
 	int		len;
 
-	while (**command == ' ')
+	while (**command == ' ' || **command == '\t')
 		*command += 1;
 	if (**command == '"' && (*command += 1))
 		next = '"';

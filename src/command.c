@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/19 14:40:36 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/24 22:30:06 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/25 13:36:55 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ int		find_exec(char *command)
 		return (1);
 	if (!stat(command, &attribs))
 	{
-		if (!(attribs.st_mode & S_IXUSR))
+		if (~(attribs.st_mode & S_IXUSR))
 			return (-1);
 	}
 	return (0);
@@ -79,7 +79,7 @@ void	execute_cmd(char **command)
 	found = 0;
 	paths = ft_strsplit(get_env_var("PATH"), ':');
 	j = 0;
-	while (paths[j])
+	while (paths && paths[j])
 		j += 1;
 	result = find_command(&command[0], paths, j, found);
 	if (result == -1)
@@ -98,19 +98,21 @@ int		execute_commands(char *command)
 	char	**commands;
 	char	**argv;
 	int		i;
+	int		parsed;
 
 	i = -1;
 	commands = ft_strsplit(command, ';');
 	while (commands[++i])
 	{
 		g_processes += 1;
-		if (ERR(prepare_command(commands, &argv, i)))
+		parsed = prepare_command(commands, &argv, i);
+		if (ERR(parsed))
 			ft_putstr("sh: please balance parentheses\n");
-		if (ft_strequ("exit", argv[0]))
+		if (parsed && ft_strequ("exit", argv[0]))
 			return (0);
-		else if (builtin_command(argv))
+		else if (parsed && builtin_command(argv))
 			;
-		else
+		else if (parsed)
 			execute_cmd(argv);
 		g_processes -= 1;
 	}

@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/19 21:09:37 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/24 15:45:53 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/25 12:09:18 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,12 @@ char	*save_cwd(char *target_dir, char **path, char ***dirs)
 	(target_dir[0] == '~' || ft_strequ("--", target_dir))
 		? (*path = ft_swap(target_dir, "~", get_env_var("HOME")))
 		: (*path = target_dir);
+	(ft_strequ("-", target_dir))
+		? (*path = ft_swap(target_dir, "-", get_env_var("OLDPWD")))
+		: (*path = target_dir);
+	tmp = *path;
 	*dirs = ft_strsplit(*path, '/');
-	if (ft_strnequ("/", target_dir, 1))
+	if (ft_strnequ("/", tmp, 1))
 	{
 		tmp = ft_strjoin("/", *dirs[0]);
 		free(*dirs[0]);

@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/19 21:11:24 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/24 15:46:15 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/25 12:28:37 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,10 +48,7 @@ void	unset_env(char *var)
 	while (g_environ[i])
 	{
 		if (ft_strnequ(g_environ[i++], var, len))
-		{
 			found = 1;
-			break ;
-		}
 	}
 	if (found)
 		remove_var(var, i, len);
