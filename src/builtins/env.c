@@ -6,17 +6,18 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/19 21:10:34 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/20 18:07:31 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/24 15:27:44 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
 
-int		builtin_env(char *command)
+int		builtin_env(int argc, char **argv)
 {
 	int		i;
 
-	(void)command;
+	(void)argc;
+	(void)argv;
 	i = 0;
 	while (g_environ[i])
 		ft_printf("%s\n", g_environ[i++]);

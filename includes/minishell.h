@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/18 15:06:01 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/19 22:08:13 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/24 22:14:18 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 
 char			**g_environ;
 int				g_processes;
-typedef int		(*t_builtinf)(char *command);
+typedef int		(*t_builtinf)(int argc, char **argv);
 typedef struct	s_builtin
 {
 	char		*cmd;
@@ -29,28 +29,36 @@ typedef struct	s_builtin
 }				t_builtin;
 
 /*
-** main.c
+** parse.c
 */
 
-int				builtin_command(char *command);
-int				unbalanced_parentheses(char *command);
+int				builtin_command(char **command);
+int				prepare_command(char **commands, char ***command, int i);
+
+/*
+** quotes.c
+*/
+
+char			**remove_quotations(char *command, int ac);
+int				count_params(char *command);
 
 /*
 ** command.c
 */
 
 void			expand_command(char **command);
-void			execute_commands(char *command);
+int				execute_commands(char *command);
 
 /*
 ** builtins.c
 */
 
-int				builtin_echo(char *command);
-int				builtin_cd(char *command);
-int				builtin_setenv(char *command);
-int				builtin_unsetenv(char *command);
-int				builtin_env(char *command);
+void			set_env_var(char *name, char *val);
+int				builtin_echo(int argc, char **argv);
+int				builtin_cd(int argc, char **argv);
+int				builtin_setenv(int argc, char **argv);
+int				builtin_unsetenv(int argc, char **argv);
+int				builtin_env(int argc, char **argv);
 
 /*
 ** env.c

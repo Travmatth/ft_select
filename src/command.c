@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/19 14:40:36 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/20 19:24:02 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/24 22:30:06 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,8 @@ int		find_command(char **command, char **paths, int i, int found)
 	char	*tmp;
 	char	*full_name;
 
+	if (ft_strequ(".", *command) || ft_strequ("..", *command))
+		return (0);
 	if ((result = find_exec(*command)) == -1 || result == 1)
 		return (result);
 	while (!found && --i >= 0)
@@ -62,42 +64,39 @@ void	execute_command(char **av)
 	if (!(pid = fork()))
 		execve(av[0], av, g_environ);
 	else if (pid > 0)
-	{
-		ft_printf("parent pid: %d\n", getpid());
 		waitpid(pid, NULL, 0);
-	}
+	else if (pid < 0)
+		ft_printf("fork error");
 }
 
-void	execute_cmd(char **commands)
+void	execute_cmd(char **command)
 {
 	int		j;
 	int		found;
-	char	**av;
 	char	**paths;
 	int		result;
 
-	j = 0;
 	found = 0;
-	av = ft_strsplit(commands[j], ' ');
 	paths = ft_strsplit(get_env_var("PATH"), ':');
+	j = 0;
 	while (paths[j])
 		j += 1;
-	result = find_command(&av[0], paths, j, found);
-	if (result)
-		execute_command(av);
-	else if (result == -1)
-		ft_printf("sh: permission denied: %s\n", av[0]);
+	result = find_command(&command[0], paths, j, found);
+	if (result == -1)
+		ft_printf("sh: permission denied: %s\n", command[0]);
+	else if (result)
+		execute_command(command);
 	else
-		ft_printf("sh: command not found: %s\n", av[0]);
+		ft_printf("sh: command not found: %s\n", command[0]);
 	while (--j >= 0)
 		free(paths[j]);
-	while (av[++j])
-		free(av[j]);
+	free(paths);
 }
 
-void	execute_commands(char *command)
+int		execute_commands(char *command)
 {
 	char	**commands;
+	char	**argv;
 	int		i;
 
 	i = -1;
@@ -105,14 +104,18 @@ void	execute_commands(char *command)
 	while (commands[++i])
 	{
 		g_processes += 1;
-		if (unbalanced_parentheses(commands[i]))
-			ft_printf("please balance parentheses: %s\n", commands[i]);
-		else if (builtin_command(commands[i]))
+		if (ERR(prepare_command(commands, &argv, i)))
+			ft_putstr("sh: please balance parentheses\n");
+		if (ft_strequ("exit", argv[0]))
+			return (0);
+		else if (builtin_command(argv))
 			;
 		else
-			execute_cmd(commands);
+			execute_cmd(argv);
 		g_processes -= 1;
 	}
-	while (i >= 0 && commands[i])
+	while (i >= 0)
 		free(commands[i--]);
+	free(commands);
+	return (1);
 }

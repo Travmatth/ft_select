@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/20 19:23:40 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/20 19:24:49 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/24 22:17:11 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,18 @@ t_builtin	g_builtins[] =
 	{"unsetenv", builtin_unsetenv, 8},
 	{"env", builtin_env, 3},
 };
+
+int		prepare_command(char **commands, char ***command, int i)
+{
+	int		ac;
+
+	expand_command(&commands[i]);
+	ac = count_params(commands[i]);
+	if (ERR(ac))
+		return (-1);
+	*command = remove_quotations(commands[i], ac);
+	return (ac);
+}
 
 void	expand_command(char **command)
 {
@@ -39,36 +51,34 @@ void	expand_command(char **command)
 		cmd = ft_strchr(tmp, ' ') ? ft_strchr(tmp, ' ') : ft_strchr(tmp, '\0');
 		tmp = ft_strsub(tmp, 0, cmd - tmp);
 		var = get_env_var(tmp + 1);
-		cmd = ft_swap(*command, tmp, var);
+		cmd = ft_swap(*command, tmp, var ? var : "");
 		free(*command);
 		free(tmp);
 		*command = cmd;
 	}
 }
 
-int		builtin_command(char *command)
+int		builtin_command(char **argv)
 {
 	int		i;
-	int		j;
+	int		ac;
 
 	i = 0;
 	while (i < 5)
 	{
-		if (ft_strnequ(g_builtins[i].cmd, command, g_builtins[i].len))
+		if (ft_strnequ(g_builtins[i].cmd, argv[0], g_builtins[i].len))
 		{
-			j = 0;
-			return (g_builtins[i].f(command));
+			ac = 0;
+			while (argv[ac])
+				ac += 1;
+			i = g_builtins[i].f(ac, argv);
+			ac -= 1;
+			while (ac >= 0 && argv[ac])
+				free(argv[ac--]);
+			free(argv);
+			return (i);
 		}
 		i += 1;
 	}
-	return (0);
-}
-
-int		unbalanced_parentheses(char *command)
-{
-	if (ft_count_char(command, '"') % 2)
-		return (1);
-	else if (ft_count_char(command, '\'') % 2)
-		return (1);
 	return (0);
 }

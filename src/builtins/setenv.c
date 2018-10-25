@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/19 21:11:08 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/20 19:28:05 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/24 15:43:37 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,21 +88,16 @@ void	set_env(char **argv)
 	set_env_var(name, value);
 }
 
-int		builtin_setenv(char *command)
+int		builtin_setenv(int argc, char **argv)
 {
-	char	**argv;
 	int		i;
 
-	argv = ft_strsplit(command, ' ');
 	if (!argv[1])
-		builtin_env(command);
+		builtin_env(argc, argv);
 	if (argv[2] && argv[3])
 		env_usage();
 	else if (argv[1])
 		set_env(argv);
 	i = 0;
-	while (argv[i])
-		free(argv[i++]);
-	free(argv);
 	return (1);
 }

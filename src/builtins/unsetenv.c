@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/19 21:11:24 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/20 19:17:24 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/24 15:46:15 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,18 +57,11 @@ void	unset_env(char *var)
 		remove_var(var, i, len);
 }
 
-int		builtin_unsetenv(char *command)
+int		builtin_unsetenv(int argc, char **argv)
 {
-	char	**argv;
-	int		i;
-
-	argv = ft_strsplit(command, ' ');
+	(void)argc;
 	if (!argv[1] || argv[2] || ft_strchr(argv[1], '='))
 		ft_putstr("unsetenv usage: `unsetenv NAME`");
 	unset_env(argv[1]);
-	i = 0;
-	while (argv[i])
-		free(argv[i++]);
-	free(argv);
 	return (1);
 }

@@ -1,1 +1,1 @@
-unsetenv HOME
+echo "this should \"work" 'this also' "that"; exit

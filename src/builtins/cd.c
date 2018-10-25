@@ -6,11 +6,42 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/19 21:09:37 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/20 17:56:09 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/24 15:45:53 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
+
+char	*save_cwd(char *target_dir, char **path, char ***dirs)
+{
+	char	buf[256];
+	char	*tmp;
+
+	(target_dir[0] == '~' || ft_strequ("--", target_dir))
+		? (*path = ft_swap(target_dir, "~", get_env_var("HOME")))
+		: (*path = target_dir);
+	*dirs = ft_strsplit(*path, '/');
+	if (ft_strnequ("/", target_dir, 1))
+	{
+		tmp = ft_strjoin("/", *dirs[0]);
+		free(*dirs[0]);
+		*dirs[0] = tmp;
+	}
+	ft_bzero((void*)buf, 256);
+	getcwd(buf, 256);
+	return (ft_strdup(buf));
+}
+
+void	update_path_vars(char *old)
+{
+	char	new[256];
+
+	set_env_var("OLDPWD", old);
+	free(old);
+	ft_bzero((void*)new, 256);
+	getcwd(new, 256);
+	set_env_var("PWD", new);
+}
 
 int		change_next_dir(char *dir, char **dirs, char *path, int i)
 {
@@ -35,12 +66,10 @@ void	change_dir(char *target_dir)
 	char		**dirs;
 	char		*dir;
 	int			i;
+	char		*old;
 
 	i = 0;
-	(target_dir[0] == '~' || ft_strequ("--", target_dir))
-		? (path = ft_swap(target_dir, "~", get_env_var("HOME")))
-		: (path = target_dir);
-	dirs = ft_strsplit(path, '/');
+	old = save_cwd(target_dir, &path, &dirs);
 	while ((dir = dirs[i++]))
 	{
 		if (change_next_dir(dir, dirs, path, i))
@@ -48,6 +77,8 @@ void	change_dir(char *target_dir)
 		else
 			break ;
 	}
+	if (!dirs[(i ? i : 1) - 1])
+		update_path_vars(old);
 	while (--i >= 0)
 		free(dirs[i]);
 	free(dirs);
@@ -55,21 +86,14 @@ void	change_dir(char *target_dir)
 		free(path);
 }
 
-int		builtin_cd(char *command)
+int		builtin_cd(int argc, char **argv)
 {
-	char	**args;
-	int		i;
-
-	args = ft_strsplit(command, ' ');
-	if (args[2])
-		ft_printf("cd: string not in pwd: %s", args[1]);
-	else if (args[1] && args[1][0] && args[1][0] != '.')
-		change_dir(args[1]);
-	else if (!args[1])
+	(void)argc;
+	if (argv[1] && argv[2])
+		ft_printf("cd: string not in pwd: %s", argv[1]);
+	else if (!argv[1])
 		change_dir("~");
-	i = -1;
-	while (args[++i])
-		free(args[i]);
-	free(args);
+	else if (argv[1] && argv[1][0] && ft_strcmp(".", argv[1]))
+		change_dir(argv[1]);
 	return (1);
 }
