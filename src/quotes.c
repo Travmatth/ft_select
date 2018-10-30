@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/24 21:44:04 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/25 13:07:56 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/29 18:33:03 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ void	set_outside_word(char **str, char *next, int *inside_word, int *current)
 
 void	set_inside_word(char **str, char *next, int *inside_word)
 {
-	if (**str == *next)
+	if (**str == *next || (*next == ' ' && **str == '\t'))
 	{
 		*next = 0;
 		*inside_word = 0;
@@ -71,28 +71,30 @@ int		count_params(char *command)
 	return ((next == '\'' || next == '\"') ? -1 : current);
 }
 
-char	*next_param(char **command)
+char	*closing_char(char **command, char *next)
 {
 	char	*tmp;
-	char	next;
-	int		len;
+	char	*first;
 
-	while (**command == ' ' || **command == '\t')
+	if (!*next)
+	{
+		*next = (**command == '"') ? '"' : 0;
+		*next = (**command == '\'') ? '\'' : *next;
+		*next = !*next ? ' ' : *next;
+	}
+	if (IS_SEP(**command))
 		*command += 1;
-	if (**command == '"' && (*command += 1))
-		next = '"';
-	else if (**command == '\'' && (*command += 1))
-		next = '\'';
-	else
-		next = ' ';
-	tmp = ft_strchr(*command, next);
+	tmp = ft_strchr(*command, *next);
+	if (*next == ' ' && (first = ft_strchr(*command, '\t')))
+	{
+		tmp = tmp ? tmp : first;
+		tmp = tmp && first && (first < tmp) ? first : tmp;
+	}
 	if (tmp && tmp != *command && *(tmp - 1) == '\\')
-		tmp = ft_strchr(tmp + 1, next);
-	if (!tmp)
-		tmp = ft_strchr(*command, '\0');
-	len = tmp - *command;
-	tmp = ft_strsub(*command, 0, len);
-	*command += len + 1;
+	{
+		tmp += 1;
+		tmp = closing_char(&tmp, next);
+	}
 	return (tmp);
 }
 
@@ -100,12 +102,25 @@ char	**remove_quotations(char *command, int ac)
 {
 	char	**av;
 	int		i;
+	char	*tmp;
+	char	next;
+	int		len;
 
 	i = 0;
 	av = (char**)ft_memalloc(sizeof(char*) * (ac + 1));
 	while (command && *command)
 	{
-		av[i++] = next_param(&command);
+		next = 0;
+		while (IS_SEP(*command) && IS_SEP(command[1]))
+			command += 1;
+		tmp = closing_char(&command, &next);
+		if (!tmp)
+			tmp = ft_strchr(command, '\0');
+		len = (tmp ? tmp : command) - command;
+		tmp = ft_strsub(command, 0, len);
+		command += len + 1;
+		av[i++] = ft_strfilter(remove_slash, tmp);
+		free(tmp);
 	}
 	return (av);
 }

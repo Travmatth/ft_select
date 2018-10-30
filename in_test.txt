@@ -1,1 +1,1 @@
- echo TOP ; ls ; echo MIDDLE ; ls ; echo BOTTOM
+/bin/ls  	"\"here\""

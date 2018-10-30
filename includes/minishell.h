@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/18 15:06:01 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/24 22:14:18 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/29 18:04:09 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@
 # include <unistd.h>
 # include <signal.h>
 # include <sys/stat.h>
+
+# define IS_SEP(x) (x == ' ' || x == '\'' || x == '\t' || x== '"')
 
 char			**g_environ;
 int				g_processes;
@@ -32,6 +34,7 @@ typedef struct	s_builtin
 ** parse.c
 */
 
+int				remove_slash(char elem, size_t i, char *str, int *stop);
 int				builtin_command(char **command);
 int				prepare_command(char **commands, char ***command, int i);
 

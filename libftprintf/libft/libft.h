@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/16 12:34:43 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/18 15:09:55 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/29 15:46:34 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -219,6 +219,11 @@ char					*ft_intmaxtoa_base(intmax_t nbr
 unsigned char			*ft_uint32_to_chr(unsigned char *output
 							, uint32_t *input
 							, unsigned int len);
+char					*ft_strfilter(int (*f)(char elem
+												, size_t i
+												, char *str
+												, int *stop)
+									, char *str);
 
 /*
 ** String functions

@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/20 19:23:40 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/25 12:56:40 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/10/29 19:12:13 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,17 @@ t_builtin	g_builtins[] =
 	{"unsetenv", builtin_unsetenv, 8},
 	{"env", builtin_env, 3},
 };
+
+int		remove_slash(char elem, size_t i, char *str, int *stop)
+{
+	int		out;
+
+	(void)stop;
+	out = 1;
+	if (elem == '\\')
+		out = IS_SEP(str[i + 1]) ? 0 : 1;
+	return (out);
+}
 
 int		prepare_command(char **commands, char ***command, int i)
 {
