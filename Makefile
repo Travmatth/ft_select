@@ -8,14 +8,12 @@ ifdef LEAKS
         DEBUG = -g
 endif
 
-NAME = minishell
+NAME = ft_select
 LIBFT = libftprintf/libftprintf.a
 CFLAGS += -Wall -Wextra -Werror -Wpedantic
-LDFLAGS := -Llibftprintf -lftprintf -I./includes
-CORE := main command signal env parse quotes
-BUILTINS := cd echo env setenv unsetenv 
-FILES := $(addprefix src/, $(CORE)) \
-		$(addprefix src/builtins/, $(BUILTINS))
+LDFLAGS := -Llibftprintf -lftprintf -I./includes -ltermcap
+CORE := main
+FILES := $(addprefix src/, $(CORE))
 SRC := $(addsuffix .c, $(FILES))
 OBJ := $(SRC:.c=.o)
 
@@ -34,19 +32,19 @@ $(OBJ): %.o: %.c
 	@$(CC) -c $(DEBUG) -I. $(CFLAGS) $< -o $@
 
 $(NAME): $(LIBFT) $(OBJ)
-	@echo -n 'Compiling minishell... '
+	@echo -n 'Compiling ft_select... '
 	@$(CC) $(DEBUG) $(CFLAGS) $(LDFLAGS) $(OBJ) -o $@
 	@echo "\033[32mdone\033[0m"
 
 clean:
 	@$(MAKE) clean -C libftprintf
-	@echo -n 'Cleaning minishell object files... '
+	@echo -n 'Cleaning ft_select object files... '
 	@rm -f $(OBJ) *.dSYM *.DS_Store
 	@echo "\033[32mdone\033[0m"
 
 fclean: clean
 	@$(MAKE) fclean -C libftprintf
-	@echo -n 'Cleaning minishell executable... '
+	@echo -n 'Cleaning ft_select executable... '
 	@rm -f $(NAME)
 	@echo "\033[32mdone\033[0m"
 

@@ -1,29 +1,39 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   signal.c                                           :+:      :+:    :+:   */
+/*   ft_select.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/10/19 19:33:17 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/10/29 19:38:25 by tmatthew         ###   ########.fr       */
+/*   Created: 2018/11/01 15:41:18 by tmatthew          #+#    #+#             */
+/*   Updated: 2018/11/04 20:31:02 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/minishell.h"
+#ifndef FT_SELECT_H
+# define FT_SELECT_H
 
-void	child_sig_handler(int sig)
-{
-	if (sig != SIGCHLD)
-		return ;
-	g_processes -= 1;
-	_exit(1);
-}
+# include "../libftprintf/srcs/includes/ft_printf.h"
+# include <termcap.h>
+# include <sys/ioctl.h>
 
-void	sig_handler(int sig)
+typedef struct	s_args
 {
-	if (sig != SIGINT)
-		return ;
-	if (g_processes <= 0)
-		write(STDOUT, "\n$>", 3);
-}
+	int			max;
+	int			total;
+}				t_args;
+
+typedef struct	s_opt
+{
+	size_t		start;
+	size_t		len;
+}				t_opt;
+
+typedef struct	s_offset
+{
+	int			rows;
+	int			cols;
+	size_t		*start;
+	size_t		*len;
+}				t_offset;
+#endif
