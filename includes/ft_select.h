@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/01 15:41:18 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/04 20:31:02 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/05 13:59:21 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,23 +17,10 @@
 # include <termcap.h>
 # include <sys/ioctl.h>
 
-typedef struct	s_args
-{
-	int			max;
-	int			total;
-}				t_args;
-
-typedef struct	s_opt
-{
-	size_t		start;
-	size_t		len;
-}				t_opt;
-
 typedef struct	s_offset
 {
 	int			rows;
 	int			cols;
-	size_t		*start;
-	size_t		*len;
+	size_t		width;
 }				t_offset;
 #endif

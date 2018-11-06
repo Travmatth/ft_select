@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:06:46 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/04 21:28:17 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/05 16:20:31 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,78 +15,86 @@
 void	*parse_arg(void *final, void *elem, size_t i, int *stop)
 {
 	size_t	size;
-	t_args	*args;
 
 	if (i == 0)
 		return (NULL);
-	if (!(final = final ? final : ft_memalloc(sizeof(t_args))))
+	if (!(final = final ? final : ft_memalloc(sizeof(size_t))))
 	{
 		*stop = 1;
 		return (NULL);
 	}
-	args = (t_args*)final;
 	size = LEN(*(char**)elem, 0);
-	if (!args->max)
-		args->max = size;
-	else if ((size_t)args->max < size)
-		args->max = size;
-	args->total += size;
+	if (*(size_t*)final < size)
+		*(size_t*)final = size;
 	return (final);
 }
 
 size_t	get_term_size(int argc, char **argv, t_offset *offsets)
 {
 	struct winsize	w;
-	t_args			*parsed_args;
+	size_t			*max;
 	size_t			total;
 
 	if (argc == 0)
 	{
 		offsets->cols = 0;
 		offsets->rows = 0;
+		return 0;
 	}
 	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-	parsed_args = (t_args*)ft_arrfoldl(parse_arg, argc, sizeof(char*), argv);
-	offsets->cols = (int)(w.ws_col ? w.ws_col : 80 / (parsed_args->max + 1));
+	max = (size_t*)ft_arrfoldl(parse_arg, argc, sizeof(char*), argv);
+	offsets->cols = (int)(w.ws_col ? w.ws_col : 80 / (*max + 1));
 	offsets->rows = argc / offsets->cols;
 	offsets->rows = offsets->rows ? offsets->rows : 1;
-	total = parsed_args->total;
-	free(parsed_args);
+	total = *max;
+	free(max);
 	return (total);
 }
 
-char	*display_args(int argc, char **argv, t_offset *offsets)
+char	*format_args(int argc, char **argv, t_offset *offsets)
 {
 	unsigned short	i;
-	size_t			total;
+	size_t			max;
 	size_t			current;
 	char			*term;
+	char			*template;
 
 	i = 0;
 	current = 0;
-	total = get_term_size(argc, argv, offsets);
-	total += argc ? argc + (argc / offsets->rows) - 1 : 0;
-	if (!(offsets->len = ft_memalloc((argc + 1) * sizeof(size_t)))
-		|| !(offsets->start = ft_memalloc((argc + 1) * sizeof(size_t)))
-		|| !(term = (char*)ft_memalloc(sizeof(char) * (total + 1))))
+	max = get_term_size(argc, argv, offsets);
+	offsets->width = max;
+	if (!(term = (char*)ft_memalloc((((max + 1) * argc) + offsets->rows) * sizeof(char)))
+		|| !(template = (char*)ft_memalloc((max + 1) * sizeof(char))))
 		return (NULL);
 	while (i < argc)
 	{
-		offsets->len[i] = LEN(argv[i], 0);
-		ft_memcpy(term + current, argv[i], offsets->len[i]);
-		term[current + offsets->len[i]] = ' ';
-		if (i++ % offsets->cols == offsets->cols - 1)
-			term[current++ + offsets->len[i] + 1] = '\n';
-		current += offsets->len[i] + 1;
+		if (i == 0 && ++i)
+			continue ;
+		ft_snprintf(template, max + 1, "%- *s", (int)(max - LEN(argv[i], 0)), argv[i]);
+		ft_memcpy(term + current, template, max);
+		term[(current + max)] = ' ';
+		current += max + 1;
+		if (i % offsets->cols == offsets->cols - 1)
+			term[current++ + 1] = '\n';
+		i += 1;
 	}
+	free(template);
 	return (term);
+}
+
+void	display(char *term, t_offset *offsets)
+{
+	(void)offsets;
+	ft_putendl(term);
 }
 
 int		main(int argc, char **argv)
 {
 	t_offset	offsets;
+	char		*term;
 
 	ft_bzero(&offsets, sizeof(offsets));
-	display_args(argc, argv, &offsets);
+	term = format_args(argc, argv, &offsets);
+	display(term, &offsets);
 	return (0);
 }
