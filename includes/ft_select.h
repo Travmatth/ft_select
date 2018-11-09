@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/01 15:41:18 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/07 20:41:51 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/08 17:43:53 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,12 @@
 
 typedef struct		s_offset
 {
+	size_t			*lens;
+	short			*selected;
+	size_t			width;
 	int				rows;
 	int				cols;
-	size_t			width;
-	size_t			*lens;
+	int				focus;
 }					t_offset;
 
 typedef struct		s_tty

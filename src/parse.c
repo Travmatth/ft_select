@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   format.c                                           :+:      :+:    :+:   */
+/*   parse.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/05 19:01:29 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/07 20:46:11 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/08 18:23:45 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,8 @@ void	format_args(int argc, char **argv, t_offset *offsets)
 
 	i = -1;
 	current = 0;
-	if (!(offsets->lens = (size_t*)ft_memalloc(argc * sizeof(size_t))))
+	if (!(offsets->lens = (size_t*)ft_memalloc(argc * sizeof(size_t)))
+		|| !(offsets->selected = (short*)ft_memalloc(argc * sizeof(short))))
 		return ;
 	offsets->width = get_term_size(argc, argv, offsets);
 	while (++i < argc)
