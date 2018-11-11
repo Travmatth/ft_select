@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/05 19:01:29 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/08 18:23:45 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/10 16:04:24 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,7 @@ void	*parse_arg(void *final, void *elem, size_t i, int *stop)
 {
 	size_t	size;
 
-	if (i == 0)
-		return (NULL);
+	(void)i;
 	if (!(final = final ? final : ft_memalloc(sizeof(size_t))))
 	{
 		*stop = 1;

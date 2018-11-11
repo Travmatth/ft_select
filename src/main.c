@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:06:46 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/08 18:58:18 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/10 16:22:15 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,34 +18,42 @@ void	ft_select_err(char *message)
 	exit(1);
 }
 
+void	write_arg(int fd, char **argv, int i, t_offset *offsets)
+{
+	int		x;
+	int		y;
+	size_t	offset;
+
+	x = i % offsets->cols;
+	y = i / offsets->cols;
+	if (offsets->focus == i)
+		ft_putstr_fd(tgoto(tgetstr("cm", NULL), y, x), fd);
+	if (offsets->selected[i])
+		ft_putstr_fd(tgetstr("us", NULL), fd);
+	ft_putstr_fd(argv[i], fd);
+	ft_putstr_fd(tgetstr("me", NULL), fd);
+	offset = offsets->width - offsets->lens[i];
+	// offset = offset ? offset : offsets->width;
+	ft_putstr_fd(offsets->blanks + offsets->width - offset, fd);
+	if (i % offsets->cols == offsets->cols - 1)
+		write(fd, "\n", 1);
+}
+
 void	display(int fd, int argc, char **argv, t_offset *offsets)
 {
 	int		i;
-	size_t	current;
-	char	*blanks;
-	char	*line;
 
-	i = (int)offsets->width;
-	if (!(blanks = (char*)ft_memalloc(i * sizeof(char)))
-		|| !(line = (char*)ft_memalloc(i * offsets->cols * sizeof(char))))
+	i = ((int)offsets->width + 2) * sizeof(char);
+	if (!(offsets->blanks = (char*)ft_memalloc(i)))
 		return ;
-	ft_memset(blanks, ' ', offsets->width);
-	i = 1;
-	current = 0;
+	ft_memset(offsets->blanks, ' ', offsets->width + 1);
+	i = 0;
 	ft_putstr_fd(tgetstr("ho", NULL), fd);
 	ft_putstr_fd(tgetstr("cd", NULL), fd);
 	while (i < argc)
 	{
 		while (i < argc && i % offsets->cols < offsets->cols)
-		{
-			current = (i - 1) * offsets->width + (i == 1 ? 0 : 1);
-			ft_memcpy(line + current, argv[i], offsets->lens[i]);
-			current += offsets->lens[i];
-			ft_memcpy(line + current, blanks, offsets->width - offsets->lens[i] + 1);
-			current += offsets->width - offsets->lens[i] + 1;
-			i += 1;
-		}
-		ft_putstr_fd(line, fd);
+			write_arg(fd, argv, i++, offsets);
 	}
 }
 
@@ -57,10 +65,8 @@ int		prepare_tty(t_tty *term)
 	char			buf[BUFF_SIZE];
 	struct termios	t;
 
-	if ((tty = getenv("FTSHELL_TTY")))
-		fd = open(tty, O_WRONLY);
-	else
-		fd = STDOUT;
+	tty = getenv("FTSHELL_TTY");
+	fd = tty ? open(tty, O_WRONLY) : STDOUT;
 	if (!OK(fd) || !isatty(fd))
 		ft_select_err("Not a terminal device");
 	else if (NONE((type = getenv(fd == 1 ? "TERM" : "FTSHELL_TERM"))))
@@ -75,6 +81,8 @@ int		prepare_tty(t_tty *term)
 	t.c_cc[VTIME] = 0;
 	if (ERR(tcsetattr(fd, TCSADRAIN, &t)))
 		ft_select_err("tcsetattr");
+	tgetstr("vi", NULL);
+	tgetstr("ti", NULL);
 	return (fd);
 }
 
@@ -87,8 +95,8 @@ int		main(int argc, char **argv)
 	if (!(fd = prepare_tty(&tty)))
 		return (1);
 	ft_bzero(&offsets, sizeof(offsets));
-	format_args(argc, argv, &offsets);
-	display(fd, argc, argv, &offsets);
+	format_args(argc - 1, &argv[1], &offsets);
+	display(fd, argc - 1, &argv[1], &offsets);
 	if (ERR(tcsetattr(fd, TCSADRAIN, &tty.attr)))
 		ft_select_err("tcsetattr");
 	return (0);

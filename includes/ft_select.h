@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/01 15:41:18 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/08 17:43:53 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/10 14:19:15 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 
 typedef struct		s_offset
 {
+	char			*blanks;
 	size_t			*lens;
 	short			*selected;
 	size_t			width;
