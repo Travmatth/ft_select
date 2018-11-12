@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/01 15:41:18 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/10 14:19:15 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/11 17:43:27 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,8 @@ typedef struct		s_tty
 	struct termios	attr;
 }					t_tty;
 
-void				format_args(int argc
+void				format_args(int fd
+							, int argc
 							, char **argv
 							, t_offset *offsets);
 #endif
