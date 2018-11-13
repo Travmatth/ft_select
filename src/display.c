@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/12 13:35:39 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/12 20:00:19 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/13 12:58:17 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,24 +71,23 @@ void	write_lines(int argc, char **argv, t_offset *offsets)
 
 void	display(int argc, char **argv, t_offset *offsets)
 {
-	char	ctrl_seq[5];
+	char	ctrl_seq[4];
 	int		b;
 
 	while (42)
 	{
 		write_lines(argc, argv, offsets);
-		ft_bzero(ctrl_seq, 5);
 		if (ERR((b = read(g_fd, &ctrl_seq, 4))))
 			ft_select_err("invalid command");
 		else if (OK(b))
 		{
-			if (ft_strequ(CURSOR_UP, ctrl_seq))
+			if (ft_strnequ(CURSOR_UP, ctrl_seq, 4))
 				cursor_up(argc, argv, offsets);
-			else if (ft_strequ(CURSOR_DOWN, ctrl_seq))
+			else if (ft_strnequ(CURSOR_DOWN, ctrl_seq, 4))
 				cursor_down(argc, argv, offsets);
-			else if (ft_strequ(CURSOR_LEFT, ctrl_seq))
+			else if (ft_strnequ(CURSOR_LEFT, ctrl_seq, 4))
 				cursor_left(argc, argv, offsets);
-			else if (ft_strequ(CURSOR_RIGHT, ctrl_seq))
+			else if (ft_strnequ(CURSOR_RIGHT, ctrl_seq, 4))
 				cursor_right(argc, argv, offsets, 0);
 			else if (ctrl_seq[0] == ' ' && !ctrl_seq[1])
 				cursor_right(argc, argv, offsets, 1);
