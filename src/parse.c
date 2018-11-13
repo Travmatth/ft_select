@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/05 19:01:29 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/11 17:53:50 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/12 14:25:42 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	*parse_arg(void *final, void *elem, size_t i, int *stop)
 	return (final);
 }
 
-size_t	get_term_size(int fd, int argc, char **argv, t_offset *offsets)
+size_t	get_term_size(int argc, char **argv, t_offset *offsets)
 {
 	struct winsize	w;
 	size_t			*max;
@@ -41,7 +41,7 @@ size_t	get_term_size(int fd, int argc, char **argv, t_offset *offsets)
 		offsets->rows = 0;
 		return 0;
 	}
-	ioctl(fd, TIOCGWINSZ, &w);
+	ioctl(g_fd, TIOCGWINSZ, &w);
 	max = (size_t*)ft_arrfoldl(parse_arg, argc, sizeof(char*), argv);
 	offsets->cols = (int)(w.ws_col ? w.ws_col : 80);
 	col_width = *max + 1 > (size_t)offsets->cols / argc;
@@ -54,7 +54,7 @@ size_t	get_term_size(int fd, int argc, char **argv, t_offset *offsets)
 	return (col_width);
 }
 
-void	format_args(int fd, int argc, char **argv, t_offset *offsets)
+void	format_args(int argc, char **argv, t_offset *offsets)
 {
 	int		i;
 	size_t	current;
@@ -64,7 +64,7 @@ void	format_args(int fd, int argc, char **argv, t_offset *offsets)
 	if (!(offsets->lens = (size_t*)ft_memalloc(argc * sizeof(size_t)))
 		|| !(offsets->selected = (short*)ft_memalloc(argc * sizeof(short))))
 		return ;
-	offsets->width = get_term_size(fd, argc, argv, offsets);
+	offsets->width = get_term_size(argc, argv, offsets);
 	while (++i < argc)
 		offsets->lens[i] = LEN(argv[i], 0);
 }

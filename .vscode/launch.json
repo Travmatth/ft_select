@@ -15,17 +15,17 @@
 			// "OLDPWD": "/nfs/2018/t/tmatthew/minishell",
 			// "HOME": "/nfs/2018/t/tmatthew",
 			"FTSHELL_TERM": "xterm-256color",
-			"FTSHELL_TTY": "/dev/ttys001"
+			"FTSHELL_TTY": "/dev/ttys000"
 		},
         "stopAtEntry": false,
         "cwd": "${workspaceRoot}",
         "preLaunchTask": "build",
 		"externalConsole": false,
-		"setupCommands": [
-			{
-				"text": "settings set target.input-path in_test.txt"
-			}
-		],
+		// "setupCommands": [
+		// 	{
+		// 		"text": "settings set target.input-path in_test.txt"
+		// 	}
+		// ],
         "linux": {
             "MIMode": "gdb",
             "setupCommands": [
