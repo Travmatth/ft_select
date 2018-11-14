@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:06:46 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/12 20:38:41 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/13 16:15:41 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,20 +42,20 @@ void	prepare_tty(t_tty *term)
 	t.c_cc[VTIME] = 0;
 	if (ERR(tcsetattr(g_fd, TCSADRAIN, &t)))
 		ft_select_err("tcsetattr");
-	tputs(tgetstr("vi", NULL), 1, ft_gputchar);
+	tputs(tgetstr("vs", NULL), 1, ft_gputchar);
 	tputs(tgetstr("ti", NULL), 1, ft_gputchar);
 }
 
-void	write_choices(int argc, char **argv, t_offset *offsets)
+void	write_choices(int argc, char **argv, t_ctx *ctx)
 {
 	int		i;
 
 	i = 0;
 	while (i < argc)
 	{
-		if (offsets->selected[i])
+		if (ctx->selected[i])
 		{
-			write(g_fd, argv[i], offsets->lens[i]);
+			write(g_fd, argv[i], ctx->lens[i]);
 			write(g_fd, " ", 1);
 		}
 		i += 1;
@@ -65,18 +65,18 @@ void	write_choices(int argc, char **argv, t_offset *offsets)
 int		main(int argc, char **argv)
 {
 	t_tty		tty;
-	t_offset	offsets;
+	t_ctx	ctx;
 
 	prepare_tty(&tty);
 	if (!g_fd)
 		return (1);
-	ft_bzero(&offsets, sizeof(offsets));
-	format_args(argc - 1, &argv[1], &offsets);
-	display(argc - 1, &argv[1], &offsets);
+	ft_bzero(&ctx, sizeof(ctx));
+	format_args(argc - 1, &argv[1], &ctx);
+	display(argc - 1, &argv[1], &ctx);
 	if (ERR(tcsetattr(g_fd, TCSANOW, &tty.attr)))
 		ft_select_err("tcsetattr");
 	tputs(tgetstr("ve", NULL), 1, ft_gputchar);
 	tputs(tgetstr("te", NULL), 1, ft_gputchar);
-	write_choices(argc - 1, &argv[1], &offsets);
+	write_choices(argc - 1, &argv[1], &ctx);
 	return (0);
 }

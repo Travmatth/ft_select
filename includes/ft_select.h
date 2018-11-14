@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/01 15:41:18 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/12 20:17:13 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/13 15:34:42 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@
 # define CURSOR_RIGHT "\x1b[C"
 
 int					g_fd;
-typedef struct		s_offset
+typedef struct		s_ctx
 {
 	char			*blanks;
 	size_t			*lens;
@@ -40,7 +40,7 @@ typedef struct		s_offset
 	int				rows;
 	int				cols;
 	int				focus;
-}					t_offset;
+}					t_ctx;
 
 typedef struct		s_tty
 {
@@ -51,26 +51,26 @@ typedef struct		s_tty
 ** events.c
 */
 
-void				cursor_up(int argc, char **argv, t_offset *offsets);
-void				cursor_down(int argc, char **argv, t_offset *offsets);
-void				cursor_left(int argc, char **argv, t_offset *offsets);
+void				cursor_up(int argc, char **argv, t_ctx *ctx);
+void				cursor_down(int argc, char **argv, t_ctx *ctx);
+void				cursor_left(int argc, char **argv, t_ctx *ctx);
 void				cursor_right(int argc
 								, char **argv
-								, t_offset *offsets
+								, t_ctx *ctx
 								, int selected);
 
 /*
 ** display.c
 */
 
-void				display(int argc, char **argv, t_offset *offsets);
+void				display(int argc, char **argv, t_ctx *ctx);
 int					ft_gputchar(int c);
 
 /*
 ** parse.c
 */
 
-void				format_args(int argc, char **argv, t_offset *offsets);
+void				format_args(int argc, char **argv, t_ctx *ctx);
 
 /*
 ** main.c

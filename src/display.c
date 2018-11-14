@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/12 13:35:39 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/13 12:58:17 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/13 16:31:30 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,79 +18,80 @@ int		ft_gputchar(int c)
 	return (0);
 }
 
-void	write_arg(int argc, char **argv, int *i, t_offset *offsets)
+void	write_arg(int argc, char **argv, int *i, t_ctx *ctx)
 {
 	int		x;
 	int		y;
 	size_t	offset;
 
-	while (*i < argc && *i % offsets->cols < offsets->cols)
+	while (*i < argc && *i % ctx->cols < ctx->cols)
 	{
-		x = *i % offsets->cols;
-		y = *i / offsets->cols;
-		if (offsets->selected[*i])
+		x = *i % ctx->cols;
+		y = *i / ctx->cols;
+		if (ctx->selected[*i])
 		{
 			ft_putstr_fd(tgetstr("so", NULL), g_fd);
 			ft_putstr_fd(tgetstr("us", NULL), g_fd);
 		}
 		ft_putstr_fd(argv[*i], g_fd);
 		ft_putstr_fd(tgetstr("me", NULL), g_fd);
-		offset = offsets->width - offsets->lens[*i];
-		ft_putstr_fd(offsets->blanks + offsets->width - offset + 1, g_fd);
-		if (*i % offsets->cols == offsets->cols - 1)
+		offset = ctx->width - ctx->lens[*i];
+		ft_putstr_fd(ctx->blanks + ctx->width - offset + 1, g_fd);
+		if (*i % ctx->cols == ctx->cols - 1)
 			write(g_fd, "\n", 1);
 		*i += 1;
 	}
 }
 
-void	display_cursor(t_offset *offsets)
+void	display_cursor(t_ctx *ctx)
 {
 	int		x;
 	int		y;
 
-	x = offsets->focus / offsets->cols;
-	y = (offsets->focus % offsets->cols);
-	tputs(tgoto(tgetstr("cm", NULL), y * offsets->width, x), 1, ft_gputchar);
+	x = ctx->focus / ctx->cols;
+	y = (ctx->focus % ctx->cols);
+	tputs(tgoto(tgetstr("cm", NULL), y * ctx->width, x), 1, ft_gputchar);
 }
 
-void	write_lines(int argc, char **argv, t_offset *offsets)
+void	write_lines(int argc, char **argv, t_ctx *ctx)
 {
 	int		i;
 
-	i = ((int)offsets->width + 2) * sizeof(char);
-	if (!(offsets->blanks = (char*)ft_memalloc(i)))
+	i = ((int)ctx->width + 2) * sizeof(char);
+	if (!(ctx->blanks = (char*)ft_memalloc(i)))
 		return ;
-	ft_memset(offsets->blanks, ' ', offsets->width + 1);
+	ft_memset(ctx->blanks, ' ', ctx->width + 1);
 	i = 0;
 	ft_putstr_fd(tgetstr("ho", NULL), g_fd);
 	ft_putstr_fd(tgetstr("cd", NULL), g_fd);
 	while (i < argc)
-		write_arg(argc, argv, &i, offsets);
-	display_cursor(offsets);
+		write_arg(argc, argv, &i, ctx);
+	display_cursor(ctx);
 }
 
-void	display(int argc, char **argv, t_offset *offsets)
+void	display(int argc, char **argv, t_ctx *ctx)
 {
 	char	ctrl_seq[4];
 	int		b;
 
 	while (42)
 	{
-		write_lines(argc, argv, offsets);
+		write_lines(argc, argv, ctx);
+		ft_bzero(ctrl_seq, 4);
 		if (ERR((b = read(g_fd, &ctrl_seq, 4))))
 			ft_select_err("invalid command");
 		else if (OK(b))
 		{
 			if (ft_strnequ(CURSOR_UP, ctrl_seq, 4))
-				cursor_up(argc, argv, offsets);
+				cursor_up(argc, argv, ctx);
 			else if (ft_strnequ(CURSOR_DOWN, ctrl_seq, 4))
-				cursor_down(argc, argv, offsets);
+				cursor_down(argc, argv, ctx);
 			else if (ft_strnequ(CURSOR_LEFT, ctrl_seq, 4))
-				cursor_left(argc, argv, offsets);
+				cursor_left(argc, argv, ctx);
 			else if (ft_strnequ(CURSOR_RIGHT, ctrl_seq, 4))
-				cursor_right(argc, argv, offsets, 0);
+				cursor_right(argc, argv, ctx, 0);
 			else if (ctrl_seq[0] == ' ' && !ctrl_seq[1])
-				cursor_right(argc, argv, offsets, 1);
+				cursor_right(argc, argv, ctx, 1);
 			else if (ctrl_seq[0] == '\n')
 				break ;
 		}
