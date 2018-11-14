@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/01 15:41:18 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/13 15:34:42 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/13 17:52:58 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,7 @@ int					ft_gputchar(int c);
 */
 
 void				format_args(int argc, char **argv, t_ctx *ctx);
+size_t				get_term_size(int argc, char **argv, t_ctx *ctx);
 
 /*
 ** main.c

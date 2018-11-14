@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/12 13:35:39 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/13 16:31:30 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/13 18:06:25 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,20 +43,23 @@ void	write_arg(int argc, char **argv, int *i, t_ctx *ctx)
 	}
 }
 
-void	display_cursor(t_ctx *ctx)
+int		small_display(int argc, char **argv, t_ctx *ctx)
 {
+	(void)argc;
+	(void)argv;
+	(void)ctx;
+	return (0);
+}
+
+int		write_lines(int argc, char **argv, t_ctx *ctx, char ctrl_seq[4])
+{
+	int		i;
 	int		x;
 	int		y;
 
-	x = ctx->focus / ctx->cols;
-	y = (ctx->focus % ctx->cols);
-	tputs(tgoto(tgetstr("cm", NULL), y * ctx->width, x), 1, ft_gputchar);
-}
-
-void	write_lines(int argc, char **argv, t_ctx *ctx)
-{
-	int		i;
-
+	if (!(ctx->width = get_term_size(argc, argv, ctx)))
+		return (small_display(argc, argv, ctx));
+	ft_bzero(ctrl_seq, 4);
 	i = ((int)ctx->width + 2) * sizeof(char);
 	if (!(ctx->blanks = (char*)ft_memalloc(i)))
 		return ;
@@ -66,7 +69,10 @@ void	write_lines(int argc, char **argv, t_ctx *ctx)
 	ft_putstr_fd(tgetstr("cd", NULL), g_fd);
 	while (i < argc)
 		write_arg(argc, argv, &i, ctx);
-	display_cursor(ctx);
+	x = ctx->focus / ctx->cols;
+	y = (ctx->focus % ctx->cols);
+	tputs(tgoto(tgetstr("cm", NULL), y * ctx->width, x), 1, ft_gputchar);
+	return (1);
 }
 
 void	display(int argc, char **argv, t_ctx *ctx)
@@ -76,24 +82,21 @@ void	display(int argc, char **argv, t_ctx *ctx)
 
 	while (42)
 	{
-		write_lines(argc, argv, ctx);
-		ft_bzero(ctrl_seq, 4);
-		if (ERR((b = read(g_fd, &ctrl_seq, 4))))
+		if (!write_lines(argc, argv, ctx, ctrl_seq))
+			break ;
+		else if (ERR((b = read(g_fd, &ctrl_seq, 4))))
 			ft_select_err("invalid command");
-		else if (OK(b))
-		{
-			if (ft_strnequ(CURSOR_UP, ctrl_seq, 4))
-				cursor_up(argc, argv, ctx);
-			else if (ft_strnequ(CURSOR_DOWN, ctrl_seq, 4))
-				cursor_down(argc, argv, ctx);
-			else if (ft_strnequ(CURSOR_LEFT, ctrl_seq, 4))
-				cursor_left(argc, argv, ctx);
-			else if (ft_strnequ(CURSOR_RIGHT, ctrl_seq, 4))
-				cursor_right(argc, argv, ctx, 0);
-			else if (ctrl_seq[0] == ' ' && !ctrl_seq[1])
-				cursor_right(argc, argv, ctx, 1);
-			else if (ctrl_seq[0] == '\n')
-				break ;
-		}
+		else if (ft_strnequ(CURSOR_UP, ctrl_seq, 4))
+			cursor_up(argc, argv, ctx);
+		else if (ft_strnequ(CURSOR_DOWN, ctrl_seq, 4))
+			cursor_down(argc, argv, ctx);
+		else if (ft_strnequ(CURSOR_LEFT, ctrl_seq, 4))
+			cursor_left(argc, argv, ctx);
+		else if (ft_strnequ(CURSOR_RIGHT, ctrl_seq, 4))
+			cursor_right(argc, argv, ctx, 0);
+		else if (ctrl_seq[0] == ' ' && !ctrl_seq[1])
+			cursor_right(argc, argv, ctx, 1);
+		else if (ctrl_seq[0] == '\n')
+			break ;
 	}
 }
