@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/12 13:35:39 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/14 16:34:01 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/15 14:19:25 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,11 +45,8 @@ void	write_arg(int argc, char **argv, int *i, t_ctx *ctx)
 
 int		small_display(t_ctx *ctx)
 {
-	tputs(tgoto(tgetstr("cm", NULL)
-			, ctx->win_row / 2
-			, ctx->win_col / 2)
-		, 1, ft_gputchar);
-	ft_putstr_fd("window too small!", g_fd);
+	tputs(tgoto(tgetstr("cm", NULL), 0, 0), 1, ft_gputchar);
+	ft_putstr_fd("error: window too small!", g_fd);
 	return (0);
 }
 
@@ -60,13 +57,13 @@ int		write_lines(int argc, char **argv, t_ctx *ctx, char ctrl_seq[4])
 	int		y;
 
 	ctx->width = get_term_size(argc, argv, ctx);
-	if (!ctx->width || ctx->win_row < ctx->win_col
-		|| ctx->width * ctx->cols < ctx->win_col)
+	if (!ctx->width || ctx->win_row < ctx->rows
+		|| (ctx->width * ctx->cols > ctx->win_col))
 		return (small_display(ctx));
 	ft_bzero(ctrl_seq, 4);
 	i = ((int)ctx->width + 2) * sizeof(char);
 	if (!(ctx->blanks = (char*)ft_memalloc(i)))
-		return ;
+		return (0);
 	ft_memset(ctx->blanks, ' ', ctx->width + 1);
 	i = 0;
 	ft_putstr_fd(tgetstr("ho", NULL), g_fd);

@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/05 19:01:29 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/14 15:25:23 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/15 13:54:25 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ size_t	get_term_size(int argc, char **argv, t_ctx *ctx)
 	col_width = *max + 1 > (size_t)ctx->cols / argc;
 	col_width = col_width ? *max + 1 : (size_t)ctx->win_col / argc;
 	ctx->cols = ctx->win_col / col_width;
-	ctx->rows = argc / ctx->cols;
+	ctx->rows = (argc / ctx->cols) + 1;
 	ctx->rows = ctx->rows ? ctx->rows : 1;
 	total = *max;
 	free(max);
