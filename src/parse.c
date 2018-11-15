@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/05 19:01:29 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/13 17:53:41 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/14 15:25:23 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,18 +35,19 @@ size_t	get_term_size(int argc, char **argv, t_ctx *ctx)
 	size_t			total;
 	size_t			col_width;
 
-	if (argc == 0)
+	ioctl(g_fd, TIOCGWINSZ, &w);
+	max = (size_t*)ft_arrfoldl(parse_arg, argc, sizeof(char*), argv);
+	if (argc == 0 || !w.ws_col || !w.ws_row || (size_t)w.ws_col < *max)
 	{
 		ctx->cols = 0;
 		ctx->rows = 0;
-		return 0;
+		return (0);
 	}
-	ioctl(g_fd, TIOCGWINSZ, &w);
-	max = (size_t*)ft_arrfoldl(parse_arg, argc, sizeof(char*), argv);
-	ctx->cols = (int)(w.ws_col ? w.ws_col : 80);
+	ctx->win_col = (int)w.ws_col;
+	ctx->win_row = (int)w.ws_row;
 	col_width = *max + 1 > (size_t)ctx->cols / argc;
-	col_width = col_width ? *max + 1 : (size_t)ctx->cols / argc;
-	ctx->cols /= col_width;
+	col_width = col_width ? *max + 1 : (size_t)ctx->win_col / argc;
+	ctx->cols = ctx->win_col / col_width;
 	ctx->rows = argc / ctx->cols;
 	ctx->rows = ctx->rows ? ctx->rows : 1;
 	total = *max;

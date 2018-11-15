@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/01 15:41:18 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/13 17:52:58 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/14 14:46:42 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,8 @@
 int					g_fd;
 typedef struct		s_ctx
 {
+	int				win_col;
+	int				win_row;
 	char			*blanks;
 	size_t			*lens;
 	short			*selected;
