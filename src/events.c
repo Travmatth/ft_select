@@ -6,40 +6,61 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/12 15:31:34 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/15 14:03:36 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/19 16:53:56 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ft_select.h"
 
-void	cursor_up(int argc, char **argv, t_ctx *ctx)
+void	cursor_up(void)
 {
-	(void)argv;
-	ctx->focus = ctx->focus > ctx->cols - 1
-		? ctx->focus - ctx->cols
-		: (ctx->rows * ctx->cols) - (ctx->cols - ctx->focus);
-	ctx->focus -= ctx->focus >= (size_t)argc ? ctx->cols : 0;
+	g_ctx->focus = g_ctx->focus > g_ctx->cols - 1
+		? g_ctx->focus - g_ctx->cols
+		: (g_ctx->rows * g_ctx->cols) - (g_ctx->cols - g_ctx->focus);
+	g_ctx->focus -= g_ctx->focus >= g_ctx.argc ? g_ctx->cols : 0;
 }
 
-void	cursor_down(int argc, char **argv, t_ctx *ctx)
+void	cursor_down(void)
 {
-	(void)argv;
-	ctx->focus = ctx->focus + ctx->cols < (size_t)argc
-		? ctx->focus + ctx->cols
-		: ctx->focus % ctx->cols;
+	g_ctx->focus = g_ctx->focus + g_ctx->cols < g_ctx.argc
+		? g_ctx->focus + g_ctx->cols
+		: g_ctx->focus % g_ctx->cols;
 }
 
-void	cursor_left(int argc, char **argv, t_ctx *ctx)
+void	cursor_left(void)
 {
-	(void)argv;
-	ctx->focus = ctx->focus ? ctx->focus - 1 : (size_t)argc - 1;
+	g_ctx->focus = g_ctx->focus ? g_ctx->focus - 1 : g_ctx.argc - 1;
 }
 
-void	cursor_right(int argc, char **argv, t_ctx *ctx, int selected)
+void	cursor_right(int selected)
 {
-	(void)argv;
 	if (selected)
-		ctx->selected[ctx->focus] = !ctx->selected[ctx->focus];
-	if (!selected || ctx->selected[ctx->focus])
-		ctx->focus = ctx->focus + 1 < (size_t)argc ? ctx->focus + 1 : 0;
+		g_ctx->selected[g_ctx->focus] = !g_ctx->selected[g_ctx->focus];
+	if (!selected || g_ctx->selected[g_ctx->focus])
+		g_ctx->focus = g_ctx->focus + 1 < g_ctx.argc ? g_ctx->focus + 1 : 0;
+}
+
+void	delete_opt()
+{
+	int		i;
+
+	if (!g_ctx.argc)
+		return ;
+	i = (int)g_ctx->focus;
+	g_ctx.argv[i] = NULL;
+	while (i + 1 < *g_ctx.argc)
+	{
+		g_ctx.argv[i] = g_ctx.argv[i + 1];
+		g_ctx->selected[i] = g_ctx->selected[i + 1];
+		g_ctx->lens[i] = g_ctx->lens[i + 1];
+		i += 1;
+	}
+	g_ctx->selected[i] = 0;
+	g_ctx->lens[i] = 0;
+	g_ctx.argv[i] = NULL;
+	if ((int)g_ctx->focus == i)
+		g_ctx->focus -= 1;
+	*g_ctx.argc -= 1;
+	if (*g_ctx.argc == -1)
+		ft_select_exit(1);
 }

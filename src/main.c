@@ -6,11 +6,16 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:06:46 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/13 17:57:15 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/19 16:49:09 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ft_select.h"
+
+void	ft_select_exit(int status)
+{
+	exit(status);
+}
 
 void	ft_select_err(char *message)
 {
@@ -18,7 +23,15 @@ void	ft_select_err(char *message)
 	exit(1);
 }
 
-void	prepare_tty(t_tty *term)
+void	restore_tty(void)
+{
+	if (ERR(tcsetattr(g_fd, TCSANOW, &g_tty)))
+		ft_select_err("tcsetattr");
+	tputs(tgetstr("ve", NULL), 1, ft_gputchar);
+	tputs(tgetstr("te", NULL), 1, ft_gputchar);
+}
+
+void	prepare_tty(void)
 {
 	char			*tty_id;
 	char			*type;
@@ -33,10 +46,10 @@ void	prepare_tty(t_tty *term)
 		ft_select_err("TERM or substitute not found");
 	else if (ERR(tgetent(buf, type)))
 		ft_select_err("Term type not valid");
-	else if (ERR(tcgetattr(g_fd, &term->attr)))
+	else if (ERR(tcgetattr(g_fd, &g_tty)))
 		ft_select_err("tcgetattr");
-	ft_memcpy(&t, &term->attr, sizeof(struct termios));
-	t = term->attr;
+	ft_memcpy(&t, &g_tty, sizeof(struct termios));
+	t = g_tty;
 	t.c_lflag &= ~(ICANON | ECHO);
 	t.c_cc[VMIN] = 1;
 	t.c_cc[VTIME] = 0;
@@ -46,37 +59,35 @@ void	prepare_tty(t_tty *term)
 	tputs(tgetstr("ti", NULL), 1, ft_gputchar);
 }
 
-void	write_choices(int argc, char **argv, t_ctx *ctx)
+int		main(int argc, char **argv)
 {
+	t_g_ctx	g_ctx;
 	int		i;
 
+	signal(SIGINT, sigint_handler);
+	signal(SIGTSTP, sigtstp_handler);
+	signal(SIGCONT, sigcont_handler);
+	prepare_tty();
+	if (!g_fd)
+		return (1);
+	ft_bzero(&g_ctx, sizeof(g_ctx));
+	g_ctx.argc = argc - 1;
+	g_ctx.argv = &argv[1];
+	format_args(argc, argv, &g_ctx);
+	display();
+	restore_tty();
 	i = 0;
 	while (i < argc)
 	{
-		if (ctx->selected[i])
+		if (g_ctx.selected[i])
 		{
-			write(g_fd, argv[i], ctx->lens[i]);
+			write(g_fd, argv[i], g_ctx.lens[i]);
 			write(g_fd, " ", 1);
 		}
 		i += 1;
 	}
-}
-
-int		main(int argc, char **argv)
-{
-	t_tty		tty;
-	t_ctx	ctx;
-
-	prepare_tty(&tty);
-	if (!g_fd)
-		return (1);
-	ft_bzero(&ctx, sizeof(ctx));
-	format_args(argc - 1, &argv[1], &ctx);
-	display(argc - 1, &argv[1], &ctx);
-	if (ERR(tcsetattr(g_fd, TCSANOW, &tty.attr)))
-		ft_select_err("tcsetattr");
-	tputs(tgetstr("ve", NULL), 1, ft_gputchar);
-	tputs(tgetstr("te", NULL), 1, ft_gputchar);
-	write_choices(argc - 1, &argv[1], &ctx);
+	free(g_ctx.selected);
+	free(g_ctx.blanks);
+	free(g_ctx.lens);
 	return (0);
 }

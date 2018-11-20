@@ -12,7 +12,7 @@ NAME = ft_select
 LIBFT = libftprintf/libftprintf.a
 CFLAGS += -Wall -Wextra -Werror -Wpedantic
 LDFLAGS := -Llibftprintf -lftprintf -I./includes -ltermcap
-CORE := main parse display events
+CORE := main parse display events signal
 FILES := $(addprefix src/, $(CORE))
 SRC := $(addsuffix .c, $(FILES))
 OBJ := $(SRC:.c=.o)
