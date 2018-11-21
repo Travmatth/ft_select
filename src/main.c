@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:06:46 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/20 18:53:12 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/20 19:12:23 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,22 +39,23 @@ void	prepare_tty(void)
 	struct termios	t;
 
 	tty_id = getenv("FTSHELL_TTY");
-	g_fd = tty_id ? open(tty_id, O_RDWR) : STDOUT;
+	g_fd = open(tty_id ? tty_id : "/dev/tty", O_RDWR);
+	ft_printf("tty %s, fd %d\n", tty_id, g_log);
 	g_log = getenv("FT_LOG") ? open(getenv("FT_LOG"), O_RDWR) : 2;
-	ft_printf("here %s", getenv("FT_LOG"));
+	ft_printf("here %s\n", getenv("FT_LOG"));
 	if (!OK(g_fd) || !isatty(g_fd))
 		ft_select_err("Not a terminal device");
-	else if (NONE((type = getenv(g_fd == 1 ? "TERM" : "FTSHELL_TERM"))))
+	else if (NONE((type = getenv("TERM") ? getenv("TERM") : getenv("FTSHELL_TERM"))))
 		ft_select_err("TERM or substitute not found");
 	else if (ERR(tgetent(buf, type)))
 		ft_select_err("Term type not valid");
-	else if (ERR(tcgetattr(g_fd, &g_tty)))
+	else if (ERR(tcgetattr(g_fd == STDOUT ? STDIN : g_fd, &g_tty)))
 		ft_select_err("tcgetattr");
 	ft_memcpy(&t, &g_tty, sizeof(struct termios));
 	t.c_lflag &= ~(ICANON | ECHO);
 	t.c_cc[VMIN] = 1;
 	t.c_cc[VTIME] = 0;
-	if (ERR(tcsetattr(g_fd == STDOUT ? STDIN : g_fd, TCSANOW, &t)))
+	if (ERR(tcsetattr(g_fd == STDOUT ? STDIN : g_fd, TCSADRAIN, &t)))
 		ft_select_err("tcsetattr");
 	tputs(tgetstr("vs", NULL), 1, ft_gputchar);
 	tputs(tgetstr("ti", NULL), 1, ft_gputchar);
