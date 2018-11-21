@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:06:46 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/19 16:49:09 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/20 18:53:12 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,8 @@ void	prepare_tty(void)
 
 	tty_id = getenv("FTSHELL_TTY");
 	g_fd = tty_id ? open(tty_id, O_RDWR) : STDOUT;
+	g_log = getenv("FT_LOG") ? open(getenv("FT_LOG"), O_RDWR) : 2;
+	ft_printf("here %s", getenv("FT_LOG"));
 	if (!OK(g_fd) || !isatty(g_fd))
 		ft_select_err("Not a terminal device");
 	else if (NONE((type = getenv(g_fd == 1 ? "TERM" : "FTSHELL_TERM"))))
@@ -49,11 +51,10 @@ void	prepare_tty(void)
 	else if (ERR(tcgetattr(g_fd, &g_tty)))
 		ft_select_err("tcgetattr");
 	ft_memcpy(&t, &g_tty, sizeof(struct termios));
-	t = g_tty;
 	t.c_lflag &= ~(ICANON | ECHO);
 	t.c_cc[VMIN] = 1;
 	t.c_cc[VTIME] = 0;
-	if (ERR(tcsetattr(g_fd, TCSADRAIN, &t)))
+	if (ERR(tcsetattr(g_fd == STDOUT ? STDIN : g_fd, TCSANOW, &t)))
 		ft_select_err("tcsetattr");
 	tputs(tgetstr("vs", NULL), 1, ft_gputchar);
 	tputs(tgetstr("ti", NULL), 1, ft_gputchar);
@@ -61,27 +62,27 @@ void	prepare_tty(void)
 
 int		main(int argc, char **argv)
 {
-	t_g_ctx	g_ctx;
-	int		i;
+	size_t	i;
 
 	signal(SIGINT, sigint_handler);
 	signal(SIGTSTP, sigtstp_handler);
 	signal(SIGCONT, sigcont_handler);
+	signal(SIGWINCH, sigwinch_handler);
 	prepare_tty();
 	if (!g_fd)
 		return (1);
 	ft_bzero(&g_ctx, sizeof(g_ctx));
-	g_ctx.argc = argc - 1;
+	g_ctx.argc = (size_t)(argc - 1);
 	g_ctx.argv = &argv[1];
-	format_args(argc, argv, &g_ctx);
+	format_args();
 	display();
 	restore_tty();
 	i = 0;
-	while (i < argc)
+	while (i < g_ctx.argc ? g_ctx.argc - 1 : 0)
 	{
 		if (g_ctx.selected[i])
 		{
-			write(g_fd, argv[i], g_ctx.lens[i]);
+			write(g_fd, g_ctx.argv[i], g_ctx.lens[i]);
 			write(g_fd, " ", 1);
 		}
 		i += 1;

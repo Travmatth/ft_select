@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/05 19:01:29 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/19 16:55:58 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/20 14:54:43 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,14 +58,17 @@ size_t	get_term_size(void)
 
 void	format_args(void)
 {
-	int		i;
+	size_t	i;
 	size_t	current;
 
-	i = -1;
+	i = 0;
 	current = 0;
 	if (!(g_ctx.lens = (size_t*)ft_memalloc(g_ctx.argc * sizeof(size_t)))
 		|| !(g_ctx.selected = (short*)ft_memalloc(g_ctx.argc * sizeof(short))))
 		return ;
-	while (++i < g_ctx.argc)
+	while (i < g_ctx.argc)
+	{
 		g_ctx.lens[i] = LEN(g_ctx.argv[i], 0);
+		i += 1;
+	}
 }

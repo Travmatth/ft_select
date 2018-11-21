@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/19 16:37:43 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/19 16:47:57 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/20 18:10:54 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,4 +34,18 @@ void	sigcont_handler(int sig)
 		return ;
 	prepare_tty();
 	display();
+}
+
+void	sigwinch_handler(int sig)
+{
+	if (sig != SIGWINCH)
+		return ;
+	ft_dprintf(g_log
+		, "width: %zu win_row: %zu rows: %zu cols: %zu win_col: %zu\n"
+		, g_ctx.width
+		, g_ctx.win_row
+		, g_ctx.rows
+		, g_ctx.cols
+		, g_ctx.win_col);
+	// display();
 }

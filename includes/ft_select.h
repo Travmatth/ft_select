@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/01 15:41:18 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/19 16:50:50 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/20 15:18:05 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,10 +46,11 @@ typedef struct		s_ctx
 	size_t			rows;
 	size_t			cols;
 	size_t			focus;
-	int				argc;
+	size_t			argc;
 }					t_ctx;
 
 int					g_fd;
+int					g_log;
 struct termios		g_tty;
 t_ctx				g_ctx;
 
@@ -84,12 +85,14 @@ size_t				get_term_size(void);
 void				sigint_handler(int sig);
 void				sigtstp_handler(int sig);
 void				sigcont_handler(int sig);
+void				sigwinch_handler(int sig);
 
 /*
 ** main.c
 */
 
 void				ft_select_err(char *message);
+void				prepare_tty(void);
 void				restore_tty(void);
 void				ft_select_exit(int argc);
 #endif
