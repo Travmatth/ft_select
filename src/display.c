@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/12 13:35:39 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/20 18:49:33 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/22 17:46:53 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,7 @@ int		write_lines(void)
 	size_t	i;
 
 	g_ctx.width = get_term_size();
+	ft_dprintf(g_log, "updated size");
 	if (!g_ctx.width || g_ctx.win_row < g_ctx.rows
 		|| (g_ctx.width * g_ctx.cols > g_ctx.win_col))
 		return (small_display());
@@ -84,6 +85,12 @@ int		write_lines(void)
 	return (1);
 }
 
+/*
+** Need to separate printing and read functionality 
+** SIGWINCH should clear screen and reprint options
+** then return control to read, who can then accept next key press
+*/
+
 void	display(void)
 {
 	char	ctrl_seq[4];
@@ -98,8 +105,8 @@ void	display(void)
 			break ;
 		else if (ERR((b = read(g_fd, &ctrl_seq, 4))))
 			ft_select_err("invalid command");
-		else if (NONE(b) && errno == EINTR)
-			exit(0);
+		else if (NONE(b)/* && errno == EINTR*/)
+			ft_dprintf(g_log, "empty");
 		else if (ft_strnequ(CURSOR_UP, ctrl_seq, 4))
 			cursor_up();
 		else if (ft_strnequ(CURSOR_DOWN, ctrl_seq, 4))

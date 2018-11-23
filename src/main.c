@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:06:46 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/20 19:12:23 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/22 17:35:05 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,8 @@ void	prepare_tty(void)
 	t.c_lflag &= ~(ICANON | ECHO);
 	t.c_cc[VMIN] = 1;
 	t.c_cc[VTIME] = 0;
-	if (ERR(tcsetattr(g_fd == STDOUT ? STDIN : g_fd, TCSADRAIN, &t)))
+	// if (ERR(tcsetattr(g_fd == STDOUT ? STDIN : g_fd, TCSADRAIN, &t)))
+	if (ERR(tcsetattr(0, TCSANOW, &t)))
 		ft_select_err("tcsetattr");
 	tputs(tgetstr("vs", NULL), 1, ft_gputchar);
 	tputs(tgetstr("ti", NULL), 1, ft_gputchar);

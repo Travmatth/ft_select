@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/19 16:37:43 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/20 19:06:41 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/22 17:49:02 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,5 +47,9 @@ void	sigwinch_handler(int sig)
 		, g_ctx.rows
 		, g_ctx.cols
 		, g_ctx.win_col);
-	display();
+	
+	// clear_display();
+	tputs(tgoto(tgetstr("cm", NULL), 0, 0), 1, ft_gputchar);
+	tputs(tgetstr("cd", NULL), 1, ft_gputchar);
+	// display();
 }
