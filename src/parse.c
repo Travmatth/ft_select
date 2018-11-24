@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/05 19:01:29 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/22 17:29:35 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/23 17:32:38 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,21 +35,19 @@ size_t	get_term_size(void)
 	size_t			total;
 	size_t			col_width;
 
-	// ioctl(g_fd, TIOCGWINSZ, &w);
-	ioctl(0, TIOCGWINSZ, &w);
+	ioctl(g_fd, TIOCGWINSZ, &w);
 	max = (size_t*)ft_arrfoldl(parse_arg
 		, g_ctx.argc, sizeof(char*), g_ctx.argv);
 	if (g_ctx.argc == 0 || !w.ws_col || !w.ws_row || (size_t)w.ws_col < *max)
-	{
-		g_ctx.cols = 0;
-		g_ctx.rows = 0;
 		return (0);
-	}
 	g_ctx.win_col = (int)w.ws_col;
 	g_ctx.win_row = (int)w.ws_row;
-	col_width = *max + 1 > (size_t)g_ctx.cols / g_ctx.argc;
-	col_width = col_width ? *max + 1 : (size_t)g_ctx.win_col / g_ctx.argc;
-	g_ctx.cols = g_ctx.win_col / col_width;
+	if (!(col_width = *max + 1 > (size_t)g_ctx.cols / g_ctx.argc)
+		|| !(col_width = col_width
+			? *max + 1 : (size_t)g_ctx.win_col / g_ctx.argc))
+		return (0);
+	if (!(g_ctx.cols = g_ctx.win_col / col_width))
+		return (0);
 	g_ctx.rows = (g_ctx.argc / g_ctx.cols) + 1;
 	g_ctx.rows = g_ctx.rows ? g_ctx.rows : 1;
 	total = *max;

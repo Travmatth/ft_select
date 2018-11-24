@@ -2,5 +2,5 @@
 **/*.o
 *.o
 .nfs*
-ft_ls
+ft_select
 test

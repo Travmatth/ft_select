@@ -1,21 +1,34 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   display.c                                          :+:      :+:    :+:   */
+/*   write_lines.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/11/12 13:35:39 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/22 17:46:53 by tmatthew         ###   ########.fr       */
+/*   Created: 2018/11/23 17:35:00 by tmatthew          #+#    #+#             */
+/*   Updated: 2018/11/23 17:37:28 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ft_select.h"
 
-int		ft_gputchar(int c)
+void	write_formatted_arg(size_t *i)
 {
-	write(g_fd, &c, 1);
-	return (0);
+	if (g_ctx.selected[*i])
+	{
+		ft_putstr_fd(tgetstr("so", NULL), g_fd);
+		ft_putstr_fd(tgetstr("us", NULL), g_fd);
+		ft_putstr_fd(g_ctx.argv[*i], g_fd);
+	}
+	else if (g_ctx.focus == (size_t)*i)
+	{
+		ft_putstr_fd(tgetstr("us", NULL), g_fd);
+		write(g_fd, g_ctx.argv[*i], 1);
+		ft_putstr_fd(tgetstr("me", NULL), g_fd);
+		write(g_fd, g_ctx.argv[*i] + 1, g_ctx.lens[*i] - 1);
+	}
+	else
+		ft_putstr_fd(g_ctx.argv[*i], g_fd);
 }
 
 void	write_arg(size_t *i)
@@ -28,21 +41,7 @@ void	write_arg(size_t *i)
 	{
 		x = *i % g_ctx.cols;
 		y = *i / g_ctx.cols;
-		if (g_ctx.selected[*i])
-		{
-			ft_putstr_fd(tgetstr("so", NULL), g_fd);
-			ft_putstr_fd(tgetstr("us", NULL), g_fd);
-			ft_putstr_fd(g_ctx.argv[*i], g_fd);
-		}
-		else if (g_ctx.focus == (size_t)*i)
-		{
-			ft_putstr_fd(tgetstr("us", NULL), g_fd);
-			write(g_fd, g_ctx.argv[*i], 1);
-			ft_putstr_fd(tgetstr("me", NULL), g_fd);
-			write(g_fd, g_ctx.argv[*i] + 1, g_ctx.lens[*i] - 1);
-		}
-		else
-			ft_putstr_fd(g_ctx.argv[*i], g_fd);
+		write_formatted_arg(i);
 		ft_putstr_fd(tgetstr("me", NULL), g_fd);
 		offset = g_ctx.width - g_ctx.lens[*i];
 		ft_putstr_fd(g_ctx.blanks + g_ctx.width - offset + 1, g_fd);
@@ -52,24 +51,20 @@ void	write_arg(size_t *i)
 	}
 }
 
-int		small_display(void)
-{
-	tputs(tgoto(tgetstr("cm", NULL), 0, 0), 1, ft_gputchar);
-	ft_putstr_fd("error: window too small!", g_fd);
-	return (0);
-}
-
 int		write_lines(void)
 {
 	int		x;
 	int		y;
 	size_t	i;
 
-	g_ctx.width = get_term_size();
-	ft_dprintf(g_log, "updated size");
-	if (!g_ctx.width || g_ctx.win_row < g_ctx.rows
+	if (!(g_ctx.width = get_term_size())
+		|| !g_ctx.width || g_ctx.win_row < g_ctx.rows
 		|| (g_ctx.width * g_ctx.cols > g_ctx.win_col))
-		return (small_display());
+	{
+		tputs(tgoto(tgetstr("cm", NULL), 0, 0), 1, ft_gputchar);
+		ft_putstr_fd("error: window too small!", g_fd);
+		return (0);
+	}
 	i = ((int)g_ctx.width + 2) * sizeof(char);
 	if (!(g_ctx.blanks = (char*)ft_memalloc(i)))
 		return (0);
@@ -85,28 +80,16 @@ int		write_lines(void)
 	return (1);
 }
 
-/*
-** Need to separate printing and read functionality 
-** SIGWINCH should clear screen and reprint options
-** then return control to read, who can then accept next key press
-*/
-
-void	display(void)
+void	read_input(void)
 {
 	char	ctrl_seq[4];
 	int		b;
 
 	while (42)
 	{
-		errno = 0;
 		ft_bzero(ctrl_seq, 4);
-		ft_putstr_fd("here\n", g_log);
-		if (!write_lines())
-			break ;
-		else if (ERR((b = read(g_fd, &ctrl_seq, 4))))
+		if (ERR((b = read(g_fd, &ctrl_seq, 4))))
 			ft_select_err("invalid command");
-		else if (NONE(b)/* && errno == EINTR*/)
-			ft_dprintf(g_log, "empty");
 		else if (ft_strnequ(CURSOR_UP, ctrl_seq, 4))
 			cursor_up();
 		else if (ft_strnequ(CURSOR_DOWN, ctrl_seq, 4))
@@ -119,12 +102,9 @@ void	display(void)
 			cursor_right(1);
 		else if (ctrl_seq[0] == '\n' && !ctrl_seq[1])
 			break ;
-		else if (ft_strnequ(DELETE, ctrl_seq, 4)
-			|| (ctrl_seq[0] == BACKSPACE && !ctrl_seq[1]))
+		else if (ft_strnequ(DELETE, ctrl_seq, 4) || (IS_BACKSPACE(ctrl_seq)))
 			delete_opt();
 		else if (ctrl_seq[0] == ESC && !ctrl_seq[1])
 			ft_select_exit(1);
-		else if (errno == EINTR)
-			ft_dprintf(g_log, "signal");
 	}
 }
