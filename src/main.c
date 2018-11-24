@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:06:46 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/23 16:52:48 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/23 17:54:12 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void	restore_tty(void)
 {
-	if (ERR(tcsetattr(g_fd, TCSANOW, &g_tty)))
+	if (ERR(tcsetattr(g_fd == STDIN ? STDOUT : g_fd, TIOCSTI, &g_tty)))
 		ft_select_err("tcsetattr");
 	tputs(tgetstr("ve", NULL), 1, ft_gputchar);
 	tputs(tgetstr("te", NULL), 1, ft_gputchar);
@@ -42,7 +42,7 @@ void	prepare_tty(void)
 	t.c_lflag &= ~(ICANON | ECHO);
 	t.c_cc[VMIN] = 1;
 	t.c_cc[VTIME] = 0;
-	if (ERR(tcsetattr(g_fd == STDIN ? STDOUT : g_fd, TCSADRAIN, &t)))
+	if (ERR(tcsetattr(g_fd == STDIN ? STDOUT : g_fd, TCSANOW, &t)))
 		ft_select_err("tcsetattr");
 	tputs(tgetstr("vs", NULL), 1, ft_gputchar);
 	tputs(tgetstr("ti", NULL), 1, ft_gputchar);
