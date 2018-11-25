@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/01 15:41:18 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/23 17:11:21 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/24 18:27:40 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,11 @@
 # define DELETE "\x1b[3~"
 # define ESC 0x1b
 # define BACKSPACE 0x7f
+
 # define IS_BACKSPACE(x) (x[0] == BACKSPACE && !x[1])
+# define IS_SPACE(x) (x[0] == ' ' && !x[1])
+# define IS_NEWLINE(x) (x[0] == '\n' && !x[1])
+# define IS_ESC(x) (x[0] == ESC && !x[1])
 
 typedef struct		s_ctx
 {

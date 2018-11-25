@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/23 17:35:00 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/23 17:37:28 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/24 18:27:22 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,6 +88,7 @@ void	read_input(void)
 	while (42)
 	{
 		ft_bzero(ctrl_seq, 4);
+		write_lines();
 		if (ERR((b = read(g_fd, &ctrl_seq, 4))))
 			ft_select_err("invalid command");
 		else if (ft_strnequ(CURSOR_UP, ctrl_seq, 4))
@@ -96,15 +97,13 @@ void	read_input(void)
 			cursor_down();
 		else if (ft_strnequ(CURSOR_LEFT, ctrl_seq, 4))
 			cursor_left();
-		else if (ft_strnequ(CURSOR_RIGHT, ctrl_seq, 4))
-			cursor_right(0);
-		else if (ctrl_seq[0] == ' ' && !ctrl_seq[1])
-			cursor_right(1);
-		else if (ctrl_seq[0] == '\n' && !ctrl_seq[1])
+		else if (ft_strnequ(CURSOR_RIGHT, ctrl_seq, 4) || IS_SPACE(ctrl_seq))
+			cursor_right(IS_SPACE(ctrl_seq) ? 1 : 0);
+		else if (IS_NEWLINE(ctrl_seq))
 			break ;
 		else if (ft_strnequ(DELETE, ctrl_seq, 4) || (IS_BACKSPACE(ctrl_seq)))
 			delete_opt();
-		else if (ctrl_seq[0] == ESC && !ctrl_seq[1])
+		else if (IS_ESC(ctrl_seq))
 			ft_select_exit(1);
 	}
 }

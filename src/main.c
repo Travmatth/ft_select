@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:06:46 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/23 17:54:12 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/24 18:32:32 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,10 @@
 
 void	restore_tty(void)
 {
-	if (ERR(tcsetattr(g_fd == STDIN ? STDOUT : g_fd, TIOCSTI, &g_tty)))
-		ft_select_err("tcsetattr");
 	tputs(tgetstr("ve", NULL), 1, ft_gputchar);
 	tputs(tgetstr("te", NULL), 1, ft_gputchar);
+	if (ERR(tcsetattr(g_fd, TCSADRAIN, &g_tty)))
+		ft_select_err("tcsetattr");
 }
 
 void	prepare_tty(void)
@@ -28,7 +28,7 @@ void	prepare_tty(void)
 	struct termios	t;
 
 	tty_id = getenv("FTSHELL_TTY");
-	g_fd = tty_id ? open(tty_id, O_RDWR) : STDOUT;
+	g_fd = open(tty_id ? tty_id : ttyname(STDIN), O_RDWR);
 	if (!OK(g_fd) || !isatty(g_fd))
 		ft_select_err("Not a terminal device");
 	else if (NONE((type = getenv("TERM")
