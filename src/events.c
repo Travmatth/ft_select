@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/12 15:31:34 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/20 14:31:09 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/26 14:53:28 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,8 +58,8 @@ void	delete_opt(void)
 	g_ctx.selected[i] = 0;
 	g_ctx.lens[i] = 0;
 	g_ctx.argv[i] = NULL;
-	if (g_ctx.argc == 0)
-		ft_select_exit(1);
+	if (g_ctx.argc == 1)
+		ft_select_exit(0);
 	if (g_ctx.focus == i)
 		g_ctx.focus -= 1;
 	g_ctx.argc -= 1;

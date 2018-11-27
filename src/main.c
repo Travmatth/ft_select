@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:06:46 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/24 18:32:32 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/26 18:09:03 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,11 @@
 
 void	restore_tty(void)
 {
-	tputs(tgetstr("ve", NULL), 1, ft_gputchar);
-	tputs(tgetstr("te", NULL), 1, ft_gputchar);
+	g_tty.c_lflag &= (ICANON | ECHO);
 	if (ERR(tcsetattr(g_fd, TCSADRAIN, &g_tty)))
 		ft_select_err("tcsetattr");
+	tputs(tgetstr("ve", NULL), 1, ft_gputchar);
+	tputs(tgetstr("te", NULL), 1, ft_gputchar);
 }
 
 void	prepare_tty(void)
@@ -44,8 +45,8 @@ void	prepare_tty(void)
 	t.c_cc[VTIME] = 0;
 	if (ERR(tcsetattr(g_fd == STDIN ? STDOUT : g_fd, TCSANOW, &t)))
 		ft_select_err("tcsetattr");
-	tputs(tgetstr("vs", NULL), 1, ft_gputchar);
 	tputs(tgetstr("ti", NULL), 1, ft_gputchar);
+	tputs(tgetstr("vi", NULL), 1, ft_gputchar);
 }
 
 int		main(int argc, char **argv)
@@ -61,6 +62,6 @@ int		main(int argc, char **argv)
 	write_lines();
 	read_input();
 	restore_tty();
-	free_args();
+	write_args();
 	return (0);
 }

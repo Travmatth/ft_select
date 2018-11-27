@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/01 15:41:18 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/24 18:27:40 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/26 16:13:22 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ typedef struct		s_ctx
 	size_t			cols;
 	size_t			focus;
 	size_t			argc;
+	// size_t			total;
 }					t_ctx;
 
 int					g_fd;
@@ -105,6 +106,6 @@ void				restore_tty(void);
 
 void				ft_select_err(char *message);
 void				ft_select_exit(int argc);
-void				free_args(void);
+void				write_args(void);
 int					ft_gputchar(int c);
 #endif
