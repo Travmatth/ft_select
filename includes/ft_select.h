@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/01 15:41:18 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/26 16:13:22 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/27 16:25:01 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,6 @@ typedef struct		s_ctx
 	size_t			cols;
 	size_t			focus;
 	size_t			argc;
-	// size_t			total;
 }					t_ctx;
 
 int					g_fd;

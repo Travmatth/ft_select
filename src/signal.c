@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/19 16:37:43 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/24 18:21:16 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/27 17:13:28 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,8 @@ void	sigwinch_handler(int sig)
 
 void	register_signals(void)
 {
+	signal(SIGABRT, sigint_handler);
+	signal(SIGTERM, sigint_handler);
 	signal(SIGINT, sigint_handler);
 	signal(SIGTSTP, sigtstp_handler);
 	signal(SIGCONT, sigcont_handler);

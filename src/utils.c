@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:06:46 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/26 18:14:16 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/27 17:15:32 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ void	ft_select_exit(int status)
 
 void	ft_select_err(char *message)
 {
+	restore_tty();
 	ft_putendl(message);
 	exit(1);
 }
