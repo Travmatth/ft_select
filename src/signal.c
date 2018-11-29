@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/19 16:37:43 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/27 17:13:28 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/28 17:29:12 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,37 +14,55 @@
 
 void	sigint_handler(int sig)
 {
-	if (sig != SIGINT)
+	struct termios	*tty;
+	t_ctx			*ctx;
+
+	if (sig != SIGINT
+		|| NONE((ctx = ctx_singleton(NULL)))
+		|| NONE((tty = tty_singleton(NULL))))
 		return ;
-	restore_tty();
+	restore_tty(tty);
+	free_args(ctx);
 	exit(1);
 }
 
 void	sigtstp_handler(int sig)
 {
-	if (sig != SIGTSTP)
+	struct termios	*tty;
+
+	if (sig != SIGTSTP || NONE((tty = tty_singleton(NULL))))
 		return ;
-	restore_tty();
+	restore_tty(tty);
 	signal(SIGTSTP, SIG_DFL);
-	ioctl(g_fd, TIOCSTI, "\x1A");
+	ioctl(fd_singleton(NIL), TIOCSTI, "\x1A");
 }
 
 void	sigcont_handler(int sig)
 {
-	if (sig != SIGCONT)
+	t_ctx	*ctx;
+	int		fd;
+
+	if (sig != SIGCONT
+		|| NONE((fd = fd_singleton(NIL)))
+		|| NONE((ctx = ctx_singleton(NULL))))
 		return ;
 	prepare_tty();
-	write_lines();
 	register_signals();
+	write_lines(fd, ctx);
 }
 
 void	sigwinch_handler(int sig)
 {
-	if (sig != SIGWINCH)
+	t_ctx	*ctx;
+	int		fd;
+
+	if (sig != SIGWINCH
+		|| NONE((fd = fd_singleton(NIL)))
+		|| NONE((ctx = ctx_singleton(NULL))))
 		return ;
 	tputs(tgoto(tgetstr("cm", NULL), 0, 0), 1, ft_gputchar);
 	tputs(tgetstr("cd", NULL), 1, ft_gputchar);
-	write_lines();
+	write_lines(fd, ctx);
 }
 
 void	register_signals(void)

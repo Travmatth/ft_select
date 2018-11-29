@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/01 15:41:18 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/27 16:25:01 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/28 17:27:19 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,33 +54,29 @@ typedef struct		s_ctx
 	size_t			argc;
 }					t_ctx;
 
-int					g_fd;
-struct termios		g_tty;
-t_ctx				g_ctx;
-
 /*
 ** events.c
 */
 
-void				cursor_up(void);
-void				cursor_down(void);
-void				cursor_left(void);
-void				cursor_right(int selected);
-void				delete_opt(void);
+void				cursor_up(t_ctx *ctx);
+void				cursor_down(t_ctx *ctx);
+void				cursor_left(t_ctx *ctx);
+void				cursor_right(t_ctx *ctx, int selected);
+void				delete_opt(t_ctx *ctx);
 
 /*
 ** write_lines.c
 */
 
-int					write_lines(void);
-void				read_input(void);
+int					write_lines(int fd, t_ctx *ctx);
+void				read_input(int fd, t_ctx *ctx);
 
 /*
 ** parse.c
 */
 
-void				format_args(void);
-size_t				get_term_size(void);
+void				format_args(t_ctx *ctx);
+size_t				get_term_size(int fd, t_ctx *ctx);
 
 /*
 ** signal.c
@@ -96,8 +92,8 @@ void				register_signals(void);
 ** main.c
 */
 
-void				prepare_tty(void);
-void				restore_tty(void);
+int					prepare_tty(void);
+void				restore_tty(struct termios *tty);
 
 /*
 ** utils.c
@@ -105,6 +101,15 @@ void				restore_tty(void);
 
 void				ft_select_err(char *message);
 void				ft_select_exit(int argc);
-void				write_args(void);
+void				write_args(t_ctx *ctx);
 int					ft_gputchar(int c);
+void				free_args(t_ctx *ctx);
+
+/*
+** singletons.c
+*/
+
+struct termios		*tty_singleton(struct termios *new);
+t_ctx				*ctx_singleton(t_ctx *new);
+int					fd_singleton(int new);
 #endif

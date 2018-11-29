@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/05 19:01:29 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/27 17:13:11 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/28 17:18:31 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,46 +28,46 @@ void	*parse_arg(void *final, void *elem, size_t i, int *stop)
 	return (final);
 }
 
-size_t	get_term_size(void)
+size_t	get_term_size(int fd, t_ctx *ctx)
 {
 	struct winsize	w;
 	size_t			*max;
 	size_t			total;
 	size_t			col_width;
 
-	ioctl(g_fd, TIOCGWINSZ, &w);
+	ioctl(fd, TIOCGWINSZ, &w);
 	max = (size_t*)ft_arrfoldl(parse_arg
-		, g_ctx.argc, sizeof(char*), g_ctx.argv);
-	if (g_ctx.argc == 0 || !w.ws_col || !w.ws_row || (size_t)w.ws_col < *max)
+		, ctx->argc, sizeof(char*), ctx->argv);
+	if (ctx->argc == 0 || !w.ws_col || !w.ws_row || (size_t)w.ws_col < *max)
 		return (0);
-	g_ctx.win_col = (int)w.ws_col;
-	g_ctx.win_row = (int)w.ws_row;
-	if (!(col_width = *max + 1 > (size_t)g_ctx.cols / g_ctx.argc)
+	ctx->win_col = (int)w.ws_col;
+	ctx->win_row = (int)w.ws_row;
+	if (!(col_width = *max + 1 > (size_t)ctx->cols / ctx->argc)
 		|| !(col_width = col_width
-			? *max + 1 : (size_t)g_ctx.win_col / g_ctx.argc))
+			? *max + 1 : (size_t)ctx->win_col / ctx->argc))
 		return (0);
-	if (!(g_ctx.cols = g_ctx.win_col / col_width))
+	if (!(ctx->cols = ctx->win_col / col_width))
 		return (0);
-	g_ctx.rows = (g_ctx.argc / g_ctx.cols) + 1;
-	g_ctx.rows = g_ctx.rows ? g_ctx.rows : 1;
+	ctx->rows = (ctx->argc / ctx->cols) + 1;
+	ctx->rows = ctx->rows ? ctx->rows : 1;
 	total = *max;
 	free(max);
 	return (col_width);
 }
 
-void	format_args(void)
+void	format_args(t_ctx *ctx)
 {
 	size_t	i;
 	size_t	current;
 
 	i = 0;
 	current = 0;
-	if (!(g_ctx.lens = (size_t*)ft_memalloc(g_ctx.argc * sizeof(size_t)))
-		|| !(g_ctx.selected = (short*)ft_memalloc(g_ctx.argc * sizeof(short))))
+	if (!(ctx->lens = (size_t*)ft_memalloc(ctx->argc * sizeof(size_t)))
+		|| !(ctx->selected = (short*)ft_memalloc(ctx->argc * sizeof(short))))
 		return ;
-	while (i < g_ctx.argc)
+	while (i < ctx->argc)
 	{
-		g_ctx.lens[i] = LEN(g_ctx.argv[i], 0);
+		ctx->lens[i] = LEN(ctx->argv[i], 0);
 		i += 1;
 	}
 }

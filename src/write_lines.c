@@ -6,81 +6,81 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/23 17:35:00 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/27 17:14:24 by tmatthew         ###   ########.fr       */
+/*   Updated: 2018/11/28 17:18:44 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ft_select.h"
 
-void	write_formatted_arg(size_t *i)
+void	write_formatted_arg(int fd, t_ctx *ctx, size_t *i)
 {
-	if (g_ctx.selected[*i])
+	if (ctx->selected[*i])
 	{
-		ft_putstr_fd(tgetstr("so", NULL), g_fd);
-		ft_putstr_fd(tgetstr("us", NULL), g_fd);
-		ft_putstr_fd(g_ctx.argv[*i], g_fd);
+		ft_putstr_fd(tgetstr("so", NULL), fd);
+		ft_putstr_fd(tgetstr("us", NULL), fd);
+		ft_putstr_fd(ctx->argv[*i], fd);
 	}
-	else if (g_ctx.focus == (size_t)*i)
+	else if (ctx->focus == *i)
 	{
-		ft_putstr_fd(tgetstr("us", NULL), g_fd);
-		write(g_fd, g_ctx.argv[*i], 1);
-		ft_putstr_fd(tgetstr("me", NULL), g_fd);
-		write(g_fd, g_ctx.argv[*i] + 1, g_ctx.lens[*i] - 1);
+		ft_putstr_fd(tgetstr("us", NULL), fd);
+		write(fd, ctx->argv[*i], 1);
+		ft_putstr_fd(tgetstr("me", NULL), fd);
+		write(fd, ctx->argv[*i] + 1, ctx->lens[*i] - 1);
 	}
 	else
-		ft_putstr_fd(g_ctx.argv[*i], g_fd);
+		ft_putstr_fd(ctx->argv[*i], fd);
 }
 
-void	write_arg(size_t *i)
+void	write_arg(int fd, t_ctx *ctx, size_t *i)
 {
 	size_t	x;
 	size_t	y;
 	size_t	offset;
 
-	while (*i < g_ctx.argc && *i % g_ctx.cols < g_ctx.cols)
+	while (*i < ctx->argc && *i % ctx->cols < ctx->cols)
 	{
-		x = *i % g_ctx.cols;
-		y = *i / g_ctx.cols;
-		write_formatted_arg(i);
-		ft_putstr_fd(tgetstr("me", NULL), g_fd);
-		offset = g_ctx.width - g_ctx.lens[*i];
-		ft_putstr_fd(g_ctx.blanks + g_ctx.width - offset + 1, g_fd);
-		if (*i % g_ctx.cols == g_ctx.cols - 1)
-			write(g_fd, "\n", 1);
+		x = *i % ctx->cols;
+		y = *i / ctx->cols;
+		write_formatted_arg(fd, ctx, i);
+		ft_putstr_fd(tgetstr("me", NULL), fd);
+		offset = ctx->width - ctx->lens[*i];
+		ft_putstr_fd(ctx->blanks + ctx->width - offset + 1, fd);
+		if (*i % ctx->cols == ctx->cols - 1)
+			write(fd, "\n", 1);
 		*i += 1;
 	}
 }
 
-int		write_lines(void)
+int		write_lines(int fd, t_ctx *ctx)
 {
 	int		x;
 	int		y;
 	size_t	i;
 
-	if (!(g_ctx.width = get_term_size())
-		|| !g_ctx.width || g_ctx.win_row < g_ctx.rows
-		|| (g_ctx.width * g_ctx.cols > g_ctx.win_col))
+	if (!(ctx->width = get_term_size(fd, ctx))
+		|| !ctx->width || ctx->win_row < ctx->rows
+		|| (ctx->width * ctx->cols > ctx->win_col))
 	{
 		tputs(tgoto(tgetstr("cm", NULL), 0, 0), 1, ft_gputchar);
-		ft_putstr_fd("error: window too small!", g_fd);
+		ft_putstr_fd("error: window too small!", fd);
 		return (0);
 	}
-	i = ((int)g_ctx.width + 2) * sizeof(char);
-	if (!(g_ctx.blanks = (char*)ft_memalloc(i)))
+	i = ((int)ctx->width + 2) * sizeof(char);
+	if (!(ctx->blanks = (char*)ft_memalloc(i)))
 		return (0);
-	ft_memset(g_ctx.blanks, ' ', g_ctx.width + 1);
+	ft_memset(ctx->blanks, ' ', ctx->width + 1);
 	i = 0;
-	ft_putstr_fd(tgetstr("ho", NULL), g_fd);
-	ft_putstr_fd(tgetstr("cd", NULL), g_fd);
-	while (i < g_ctx.argc)
-		write_arg(&i);
-	x = g_ctx.focus / g_ctx.cols;
-	y = (g_ctx.focus % g_ctx.cols);
-	tputs(tgoto(tgetstr("cm", NULL), y * g_ctx.width, x), 1, ft_gputchar);
+	ft_putstr_fd(tgetstr("ho", NULL), fd);
+	ft_putstr_fd(tgetstr("cd", NULL), fd);
+	while (i < ctx->argc)
+		write_arg(fd, ctx, &i);
+	x = ctx->focus / ctx->cols;
+	y = (ctx->focus % ctx->cols);
+	tputs(tgoto(tgetstr("cm", NULL), y * ctx->width, x), 1, ft_gputchar);
 	return (1);
 }
 
-void	read_input(void)
+void	read_input(int fd, t_ctx *ctx)
 {
 	char	ctrl_seq[4];
 	int		b;
@@ -88,21 +88,21 @@ void	read_input(void)
 	while (42)
 	{
 		ft_bzero(ctrl_seq, 4);
-		write_lines();
-		if (ERR((b = read(g_fd, &ctrl_seq, 4))))
+		write_lines(fd, ctx);
+		if (ERR((b = read(fd, &ctrl_seq, 4))))
 			ft_select_err("invalid command");
 		else if (ft_strnequ(CURSOR_UP, ctrl_seq, 4))
-			cursor_up();
+			cursor_up(ctx);
 		else if (ft_strnequ(CURSOR_DOWN, ctrl_seq, 4))
-			cursor_down();
+			cursor_down(ctx);
 		else if (ft_strnequ(CURSOR_LEFT, ctrl_seq, 4))
-			cursor_left();
+			cursor_left(ctx);
 		else if (ft_strnequ(CURSOR_RIGHT, ctrl_seq, 4) || IS_SPACE(ctrl_seq))
-			cursor_right(IS_SPACE(ctrl_seq) ? 1 : 0);
+			cursor_right(ctx, IS_SPACE(ctrl_seq) ? TRUE : FALSE);
 		else if (IS_NEWLINE(ctrl_seq))
 			break ;
 		else if (ft_strnequ(DELETE, ctrl_seq, 4) || (IS_BACKSPACE(ctrl_seq)))
-			delete_opt();
+			delete_opt(ctx);
 		else if (IS_ESC(ctrl_seq))
 			ft_select_exit(1);
 	}
