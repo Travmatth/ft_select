@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:06:46 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/28 17:15:41 by tmatthew         ###   ########.fr       */
+/*   Updated: 2019/01/29 14:44:34 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,6 @@ void	write_args(t_ctx *ctx)
 void	free_args(t_ctx *ctx)
 {
 	free(ctx->selected);
-	free(ctx->blanks);
 	free(ctx->lens);
 }
 

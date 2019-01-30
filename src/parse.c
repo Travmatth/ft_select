@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/05 19:01:29 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/28 17:18:31 by tmatthew         ###   ########.fr       */
+/*   Updated: 2019/01/29 17:35:41 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,14 @@ void	*parse_arg(void *final, void *elem, size_t i, int *stop)
 	return (final);
 }
 
+void	fill_ctx(t_ctx *ctx, struct winsize *w)
+{
+	ctx->win_col = (int)w->ws_col;
+	ctx->win_row = (int)w->ws_row;
+	ctx->rows = (ctx->argc / ctx->cols) + 1;
+	ctx->rows = ctx->rows ? ctx->rows : 1;
+}
+
 size_t	get_term_size(int fd, t_ctx *ctx)
 {
 	struct winsize	w;
@@ -36,20 +44,20 @@ size_t	get_term_size(int fd, t_ctx *ctx)
 	size_t			col_width;
 
 	ioctl(fd, TIOCGWINSZ, &w);
-	max = (size_t*)ft_arrfoldl(parse_arg
-		, ctx->argc, sizeof(char*), ctx->argv);
+	max = (size_t*)ft_arrfoldl(parse_arg, ctx->argc, sizeof(char*), ctx->argv);
 	if (ctx->argc == 0 || !w.ws_col || !w.ws_row || (size_t)w.ws_col < *max)
+	{
+		free(max);
 		return (0);
-	ctx->win_col = (int)w.ws_col;
-	ctx->win_row = (int)w.ws_row;
+	}
 	if (!(col_width = *max + 1 > (size_t)ctx->cols / ctx->argc)
-		|| !(col_width = col_width
-			? *max + 1 : (size_t)ctx->win_col / ctx->argc))
+		|| !(col_width = col_width ? *max + 1 : w.ws_col / ctx->argc)
+		|| !(ctx->cols = w.ws_col / col_width))
+	{
+		free(max);
 		return (0);
-	if (!(ctx->cols = ctx->win_col / col_width))
-		return (0);
-	ctx->rows = (ctx->argc / ctx->cols) + 1;
-	ctx->rows = ctx->rows ? ctx->rows : 1;
+	}
+	fill_ctx(ctx, &w);
 	total = *max;
 	free(max);
 	return (col_width);

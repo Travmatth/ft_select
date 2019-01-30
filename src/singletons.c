@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/28 16:45:17 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/28 17:19:09 by tmatthew         ###   ########.fr       */
+/*   Updated: 2019/01/30 15:15:25 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ struct termios	*tty_singleton(struct termios *new)
 {
 	static struct termios	*ctx;
 
-	if (new != NULL)
+	if (new != NULL && !ctx)
 		ctx = ft_memdup(new, sizeof(struct termios));
 	return (ctx);
 }

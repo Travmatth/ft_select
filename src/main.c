@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/23 20:06:46 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/28 17:27:37 by tmatthew         ###   ########.fr       */
+/*   Updated: 2019/01/29 13:50:27 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,9 @@ int		main(int argc, char **argv)
 	int				fd;
 	struct termios	*tty;
 
-	if ((ctx = ft_memalloc(sizeof(t_ctx))))
+	if (argc == 1)
+		ft_putstr("error: no params given\n");
+	else if ((ctx = ft_memalloc(sizeof(t_ctx))))
 	{
 		ctx_singleton(ctx);
 		fd = prepare_tty();

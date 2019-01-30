@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/23 17:35:00 by tmatthew          #+#    #+#             */
-/*   Updated: 2018/11/28 17:18:44 by tmatthew         ###   ########.fr       */
+/*   Updated: 2019/01/29 16:21:52 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,9 +57,8 @@ int		write_lines(int fd, t_ctx *ctx)
 	int		y;
 	size_t	i;
 
-	if (!(ctx->width = get_term_size(fd, ctx))
-		|| !ctx->width || ctx->win_row < ctx->rows
-		|| (ctx->width * ctx->cols > ctx->win_col))
+	if (!(ctx->width = get_term_size(fd, ctx)) || !ctx->width
+		|| ctx->win_row < ctx->rows || (ctx->width * ctx->cols > ctx->win_col))
 	{
 		tputs(tgoto(tgetstr("cm", NULL), 0, 0), 1, ft_gputchar);
 		ft_putstr_fd("error: window too small!", fd);
@@ -77,6 +76,7 @@ int		write_lines(int fd, t_ctx *ctx)
 	x = ctx->focus / ctx->cols;
 	y = (ctx->focus % ctx->cols);
 	tputs(tgoto(tgetstr("cm", NULL), y * ctx->width, x), 1, ft_gputchar);
+	free(ctx->blanks);
 	return (1);
 }
 
