@@ -6,7 +6,7 @@
 /*   By: tmatthew <tmatthew@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/05 19:01:29 by tmatthew          #+#    #+#             */
-/*   Updated: 2019/01/29 17:35:41 by tmatthew         ###   ########.fr       */
+/*   Updated: 2019/01/30 18:57:38 by tmatthew         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,8 @@ size_t	get_term_size(int fd, t_ctx *ctx)
 		free(max);
 		return (0);
 	}
-	if (!(col_width = *max + 1 > (size_t)ctx->cols / ctx->argc)
-		|| !(col_width = col_width ? *max + 1 : w.ws_col / ctx->argc)
+	col_width = *max + 1 > w.ws_col / ctx->argc;
+	if (!(col_width = col_width ? *max + 1 : w.ws_col / ctx->argc)
 		|| !(ctx->cols = w.ws_col / col_width))
 	{
 		free(max);
